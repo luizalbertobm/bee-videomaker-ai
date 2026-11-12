@@ -49,4 +49,4 @@ Fundo quase preto, grelha em perspetiva, partículas, linhas de luz e contadores
 
 - Guardar `WIDTH`, `HEIGHT`, `FPS`, `DURATION_S` e uma `renderFrame(t)` pura, como nas demos.
 - Helpers de easing: `seg(t, t0, d)`, `easeOut`, `easeInOut`, `easeIn`, `backOut`. Copiar das demos.
-- Rever sempre uma folha de contacto de 8 frames antes de aceitar a cena (ver `licoes-aprendidas.md`).
+- Rever sempre uma folha de contacto de 8 frames antes de aceitar a cena: `python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/contact_sheet.py scenes/NN.mp4`.

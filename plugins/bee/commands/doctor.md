@@ -41,7 +41,7 @@ Regras para todos os passos:
 `ffmpeg`/`ffprobe`, `bc` e `python3`. Junta os que faltam num só comando do gestor de pacotes indicado em `package_manager`.
 
 ### Passo 2 — Pacotes Python (`group: python`)
-`playwright`, `numpy` e `faster-whisper` são obrigatórios; `pillow` é opcional. Junta os que faltam num só `pip install`, com as flags que o `fix` traz. Avisa que o `faster-whisper` descarrega um modelo de cerca de 3 GB na primeira transcrição, não agora. Se o pip recusar por "externally-managed-environment", propõe um ambiente virtual (`python3 -m venv .venv && source .venv/bin/activate`) em vez de forçar.
+`playwright`, `numpy` e `faster-whisper`, todos obrigatórios. Junta os que faltam num só `pip install`, com as flags que o `fix` traz. Avisa que o `faster-whisper` descarrega um modelo de cerca de 3 GB na primeira transcrição, não agora. Se o pip recusar por "externally-managed-environment", propõe um ambiente virtual (`python3 -m venv .venv && source .venv/bin/activate`) em vez de forçar.
 
 ### Passo 3 — Google Chrome (`group: chrome`)
 O render desenha as cenas no Chrome. Se faltar, mostra o `fix`. Alternativa sem Chrome: `python3 -m playwright install chromium` e trocar `channel="chrome"` por Chromium em `render_canvas.py`; só a proponhas se o utilizador não puder instalar o Chrome.
@@ -69,7 +69,7 @@ O script não os consegue ver; verifica tu nas ferramentas desta sessão:
 Se algum faltar, lê `${CLAUDE_PLUGIN_ROOT}/skills/videomaker/references/setup-mcp.md` e guia o utilizador pelo registo e pelo login (o login é feito por ele no browser). Diz claramente que, sem ElevenLabs, a skill ainda faz roteiro, cenas Canvas, efeitos e montagem, e pode usar narração já gravada.
 
 ### Passo 9 — Teste final
-Com os obrigatórios dos passos 1 a 3 prontos, corre o teste real da cadeia, que renderiza uma cena mínima, converte um ícone, faz uma faixa de efeitos e monta o vídeo, tudo numa pasta temporária:
+Com os obrigatórios dos passos 1 a 3 prontos, corre o teste real da cadeia, que renderiza uma cena mínima, converte um ícone, faz uma faixa de efeitos, monta o vídeo e tira uma folha de contacto, tudo numa pasta temporária:
 
 ```bash
 bash ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/doctor.sh --smoke

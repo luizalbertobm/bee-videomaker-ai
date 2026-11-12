@@ -22,7 +22,7 @@ Ler antes de estimar custos, gerar áudio/vídeo ou montar. Acrescentar uma linh
 - Varrimento de luz em `lighter` mancha fundos escuros; redesenhar o texto com um gradiente como `fillStyle`.
 - Caixas de texto: nunca fixar a largura; medir com `measureText` e somar padding. Rever os frames finais de cada cena em meia resolução antes de aceitar.
 - Ao gerar vários ficheiros a partir de um cabeçalho com `sed`, usar marcadores únicos (`__DUR__`), não substrings de identificadores.
-- Três cenas (~450 frames) renderizam em paralelo em cerca de um minuto; lançar com `&` e `wait`. Folhas de contacto (PIL) são a forma mais barata de rever uma animação.
+- Três cenas (~450 frames) renderizam em paralelo em cerca de um minuto; lançar com `&` e `wait`. Folhas de contacto (`scripts/contact_sheet.py`, só ffmpeg) são a forma mais barata de rever uma animação.
 
 ## Logos em SVG
 - SVGs exportados sem IDs ainda têm cada peça num grupo de topo: dá para os dividir em camadas com o mesmo viewBox e animar cada uma (escala, rotação com pivô, alpha) sem redesenhar a marca. Classificar letras por serem `<g fill=…>` sem clip-path, não pela cor.
@@ -46,7 +46,7 @@ Ler antes de estimar custos, gerar áudio/vídeo ou montar. Acrescentar uma linh
 - `scenes/`, `audio/` e `build/` são partilhadas: um segundo vídeo no mesmo repositório sobrescreve o anterior. Usar subpastas por projeto ou arquivar antes de começar.
 
 ## Reel com vídeo real
-- Escolher stock a olhar, não pelo título: pedir ~24 resultados por termo, descarregar só as miniaturas, montar folhas de contacto e só então descarregar os eleitos.
+- Escolher stock a olhar, não pelo título: pedir ~24 resultados por termo, descarregar só as miniaturas, montar uma folha de contacto com `contact_sheet.py` e só então descarregar os eleitos.
 - Recorte 9:16 por plano: cada fonte horizontal precisa do seu centro de recorte, escolhido em frames reais. 4K horizontal recorta sem perda; 1080p fica ampliado 1,78× e aguenta com `lanczos` + `unsharp=5:5:0.5`.
 - `render_canvas.py --background video.mp4 --dim 0.55` compõe a cena (canvas transparente) sobre o vídeo; preparar à parte um MP4 de fundo por cena (planos cortados, recortados, mesma correção de cor) numa subpasta, para a montagem não o ler como cena.
 - Zona segura de reel: título e etiquetas entre y≈1130 e y≈1480; nada importante acima de y=120 nem nos ~400 px de baixo, que a interface do Instagram tapa.

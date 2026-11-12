@@ -35,10 +35,12 @@ HTML
   icon() { (cd "$T" && python3 "$SKILL_DIR/scripts/icons.py" rocket && grep -q '"rocket"' sources/icons/lucide/icons.js); }
   sfx() { (cd "$T" && printf '0.05 pop -18\n0.25 click_001 -16\n' > cues.tsv && python3 "$SKILL_DIR/scripts/sfx_track.py" cues.tsv sfx.wav --duration 0.5 && [[ -s sfx.wav ]]); }
   mount() { (cd "$T" && SFX=sfx.wav bash "$SKILL_DIR/scripts/montagem.ffmpeg.sh" final.mp4 && [[ -s final.mp4 ]]); }
+  sheet() { (cd "$T" && python3 "$SKILL_DIR/scripts/contact_sheet.py" final.mp4 --frames 4 --width 120 --out folha.png && [[ -s folha.png ]]); }
   step "Cena Canvas → MP4 (Chrome + Playwright + ffmpeg)" render
   step "Ícone Lucide do pacote local" icon
   step "Faixa de efeitos sonoros (numpy + biblioteca local)" sfx
   step "Montagem final com efeitos" mount
+  step "Folha de contacto (ffmpeg)" sheet
   [[ $FAIL -eq 0 ]] && echo "A cadeia funciona de ponta a ponta." || { echo "Há passos a falhar acima."; exit 1; }
   exit 0
 fi
@@ -69,7 +71,6 @@ if has python3; then add python3 sistema 1 ok "python3" "$(python3 --version 2>&
 pymod playwright && add playwright python 1 ok "playwright (Python)" "" "" || add playwright python 1 missing "playwright (Python)" "comanda o Chrome para desenhar cada frame das cenas Canvas" "$PIP playwright"
 pymod numpy && add numpy python 1 ok "numpy" "" "" || add numpy python 1 missing "numpy" "mistura a faixa de efeitos sonoros (sfx_track.py)" "$PIP numpy"
 pymod faster_whisper && add faster-whisper python 1 ok "faster-whisper" "" "" || add faster-whisper python 1 missing "faster-whisper" "transcrição local e legendas (o modelo large-v3, ~3 GB, é descarregado no primeiro uso)" "$PIP faster-whisper"
-pymod PIL && add pillow python 0 ok "Pillow" "" "" || add pillow python 0 missing "Pillow" "opcional: folhas de contacto para rever animações sem abrir o vídeo" "$PIP pillow"
 
 # 3. Chrome
 if has google-chrome || has google-chrome-stable || [[ -x "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ]]; then add chrome chrome 1 ok "Google Chrome" "o render usa channel=chrome" ""

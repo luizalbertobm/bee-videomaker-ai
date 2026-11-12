@@ -25,7 +25,7 @@ Depois, no projeto: `/bee:doctor`. Na primeira vez é um assistente guiado: ferr
 - `sources/logos/` com os logos da marca (SVG de preferência) e `sources/fonts/` com as fontes `.ttf` (`display.ttf`, `body.ttf`, ou ajustar `FONT_FACES` nos modelos).
 - Opcional: `sources/identidade-visual.md` com o resumo do manual da marca; `.env` com `PIXABAY_API_KEY` para stock de vídeo.
 - Conector ElevenLabs ligado ao Claude (tools `creative_*`); Higgsfield opcional para imagens e vídeo gerados.
-- Localmente: ffmpeg, bc, Python 3 com `playwright`, `numpy` e `faster-whisper` (`pillow` opcional), Google Chrome.
+- Localmente: ffmpeg, bc, Python 3 com `playwright`, `numpy` e `faster-whisper`, Google Chrome.
 
 ## Estrutura
 
@@ -39,7 +39,8 @@ plugins/bee/
     assets/             template de cena, 3 demos de estilo, helper de ícones, modelo de roteiro,
                         icons/ (pacote Lucide completo), sfx/ (sons base + kenney-interface/)
     references/         estilos de animação, lições aprendidas, setup dos conectores e chaves
-    scripts/            render_canvas.py, transcribe.py, stock.py, icons.py, sfx_track.py, montagem.ffmpeg.sh, doctor.sh
+    scripts/            render_canvas.py, transcribe.py, stock.py, icons.py, sfx_track.py, contact_sheet.py,
+                        montagem.ffmpeg.sh, doctor.sh
 ```
 
 ## Licença
