@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt"><head><meta charset="utf-8"><title>Estilo 1 — Tipografia cinética</title>
+<style>body{margin:0;background:#111;display:grid;place-items:center;height:100vh}canvas{max-height:100vh;max-width:100vw}</style>
+</head><body><canvas id="c"></canvas>
+<script>
+// ESTILO 1 — TIPOGRAFIA CINÉTICA. Palavras grandes que entram ao ritmo da narração, fundos sólidos que
+// trocam por frase, cortes secos, overshoot curto. Tudo deriva de t; sem estado entre frames.
+const WIDTH = 1080, HEIGHT = 1920, FPS = 30, DURATION_S = 4.0;
+const canvas = document.getElementById('c'); canvas.width = WIDTH; canvas.height = HEIGHT;
+const ctx = canvas.getContext('2d');
+const C = { dark: '#1a1a1a', yellow: '#ffbf00', white: '#ffffff' };
+const FONT = 'Inter, "DejaVu Sans", Arial, sans-serif';
+const clamp01 = x => Math.min(1, Math.max(0, x));
+const seg = (t, t0, d) => clamp01((t - t0) / d);
+const backOut = (t, s = 1.4) => 1 + (s + 1) * Math.pow(t - 1, 3) + s * Math.pow(t - 1, 2);
+const easeOut = t => 1 - Math.pow(1 - t, 3), easeIn = t => t * t * t, easeInOut = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2;
+
+// Guião: [t0, duração, texto, fundo, cor do texto, variante]
+const BEATS = [
+  [0.00, 0.85, 'CRIE',      C.dark,   C.white,  'slam'],
+  [0.85, 0.75, 'ALGO',      C.yellow, C.dark,   'wipe'],
+  [1.60, 0.90, 'NOVO',      C.dark,   C.yellow, 'rise'],
+  [2.50, 1.50, 'HOJE MESMO.', C.white, C.dark,  'stack'],
+];
+
+function fitFont(text, maxW, weight = 900, maxSize = 300) {
+  let size = maxSize; ctx.font = `${weight} ${size}px ${FONT}`;
+  while (ctx.measureText(text).width > maxW && size > 40) { size -= 10; ctx.font = `${weight} ${size}px ${FONT}`; }
+  return size;
+}
+
+function renderFrame(t) {
+  const i = Math.max(0, BEATS.findIndex(b => t < b[0] + b[1])) ;
+  const [t0, d, text, bg, fg, kind] = BEATS[i === -1 ? BEATS.length - 1 : i];
+  const p = seg(t, t0, d), local = t - t0;
+  // Fundo sólido com corte seco; uma barra de cor "arrasta" o corte nos primeiros 0,18 s
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  if (i > 0) { const w = easeOut(seg(local, 0, 0.18)); ctx.fillStyle = BEATS[i - 1][3]; ctx.fillRect(0, 0, WIDTH, HEIGHT * (1 - w)); }
+
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = fg;
+  const cx = WIDTH / 2, cy = HEIGHT / 2;
+  if (kind === 'slam') {               // escala 1.8 → 1 com overshoot, leve rotação que assenta
+    const e = backOut(seg(local, 0.02, 0.38)), size = fitFont(text, 960);
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate((1 - e) * -0.12); ctx.scale(1.45 - 0.45 * e, 1.45 - 0.45 * e);
+    ctx.globalAlpha = seg(local, 0, 0.12); ctx.fillText(text, 0, 0); ctx.restore();
+    // barra de acento que entra por baixo
+    const b = easeOut(seg(local, 0.25, 0.3)); ctx.fillStyle = C.yellow; ctx.fillRect(cx - 240 * b, cy + size * 0.5, 480 * b, 18);
+  } else if (kind === 'wipe') {        // revelado por máscara da esquerda para a direita
+    const size = fitFont(text, 960), w = ctx.measureText(text).width, e = easeInOut(seg(local, 0.02, 0.35));
+    ctx.save(); ctx.beginPath(); ctx.rect(cx - w / 2 - 20, cy - size, (w + 40) * e, size * 2); ctx.clip();
+    ctx.fillText(text, cx, cy); ctx.restore();
+    // linha de corte vertical que acompanha a máscara
+    if (e < 1) { ctx.fillStyle = C.dark; ctx.fillRect(cx - w / 2 - 20 + (w + 40) * e - 6, cy - size * 0.75, 12, size * 1.5); }
+  } else if (kind === 'rise') {        // letras sobem uma a uma com stagger, com clip na linha de base
+    const size = fitFont(text, 960); const chars = text.split(''); const widths = chars.map(c => ctx.measureText(c).width);
+    const total = widths.reduce((a, b) => a + b, 0); let x = cx - total / 2;
+    ctx.save(); ctx.beginPath(); ctx.rect(0, cy - size * 0.7, WIDTH, size * 1.4); ctx.clip(); ctx.textAlign = 'left';
+    chars.forEach((c, k) => { const e = easeOut(seg(local, 0.03 + k * 0.06, 0.4)); ctx.fillText(c, x, cy + (1 - e) * size * 1.1); x += widths[k]; });
+    ctx.restore();
+  } else {                              // 'stack': palavras empilham-se, a última ganha cor; saída por queda no fim
+    const words = text.split(' '), size = fitFont(words.reduce((a, b) => a.length > b.length ? a : b), 900, 900, 260);
+    const lineH = size * 1.0, startY = cy - lineH * (words.length - 1) / 2;
+    const out = easeIn(seg(local, d - 0.3, 0.3));
+    words.forEach((w, k) => {
+      const e = backOut(seg(local, 0.05 + k * 0.22, 0.35));
+      ctx.save(); ctx.globalAlpha = seg(local, 0.05 + k * 0.22, 0.1) * (1 - out);
+      ctx.fillStyle = k === words.length - 1 ? C.yellow : fg;
+      ctx.translate(cx, startY + k * lineH + (1 - e) * 60 + out * 200 * (k + 1)); ctx.scale(1, 0.6 + 0.4 * e);
+      ctx.fillText(w, 0, 0); ctx.restore();
+    });
+  }
+  // Contador de progresso discreto no rodapé (rodapé fixo é um "ancoramento" típico do estilo)
+  ctx.fillStyle = fg; ctx.globalAlpha = 0.6; ctx.fillRect(0, HEIGHT - 10, WIDTH * clamp01(t / DURATION_S), 10); ctx.globalAlpha = 1;
+}
+let start = performance.now();
+(function loop(now) { renderFrame(((now - start) / 1000) % DURATION_S); requestAnimationFrame(loop); })(start);
+</script></body></html>

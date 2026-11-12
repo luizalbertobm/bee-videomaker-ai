@@ -1,0 +1,26 @@
+{
+  "name": "bee",
+  "displayName": "Bee — Video Pipeline",
+  "version": "1.0.0",
+  "description": "Produz reels e vídeos curtos de ponta a ponta: roteiro, cenas Canvas renderizadas localmente (3 estilos, ícones Lucide, logo animado), narração e música via ElevenLabs, stock gratuito, transcrição local e montagem ffmpeg.",
+  "author": {
+    "name": "luizalbertobm",
+    "url": "https://github.com/luizalbertobm"
+  },
+  "license": "MIT",
+  "keywords": [
+    "video",
+    "reels",
+    "canvas",
+    "elevenlabs",
+    "ffmpeg",
+    "motion-graphics"
+  ],
+  "commands": {
+    "doctor": {
+      "source": "./commands/doctor.md",
+      "description": "Verifica dependências locais da skill video-pipeline (ffmpeg, Chrome, playwright, faster-whisper, fontes, chaves)"
+    }
+  },
+  "repository": "https://github.com/luizalbertobm/bee-video-pipeline"
+}

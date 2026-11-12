@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt"><head><meta charset="utf-8"><title>Estilo 3 — Tech escuro com brilho</title>
+<style>body{margin:0;background:#111;display:grid;place-items:center;height:100vh}canvas{max-height:100vh;max-width:100vw}</style>
+</head><body><canvas id="c"></canvas>
+<script>
+// ESTILO 3 — TECH ESCURO COM BRILHO. Fundo quase preto, grelha em perspetiva, partículas, linhas luminosas,
+// contadores numéricos e varrimentos de luz. Partículas determinísticas por hash (sem Math.random).
+const WIDTH = 1080, HEIGHT = 1920, FPS = 30, DURATION_S = 4.0;
+const canvas = document.getElementById('c'); canvas.width = WIDTH; canvas.height = HEIGHT;
+const ctx = canvas.getContext('2d');
+const C = { bg: '#0b0e14', yellow: '#ffbf00', white: '#f3f4f6', dim: 'rgba(255,191,0,0.14)' };
+const FONT = 'Inter, "DejaVu Sans", Arial, sans-serif';
+const clamp01 = x => Math.min(1, Math.max(0, x));
+const seg = (t, t0, d) => clamp01((t - t0) / d);
+const easeOut = t => 1 - Math.pow(1 - t, 3), easeInOut = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2;
+const hash = (i, j = 0) => { const x = Math.sin(i * 127.1 + j * 311.7) * 43758.5453; return x - Math.floor(x); };
+
+function glowLine(x1, y1, x2, y2, color, lw, blur) { ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.shadowColor = color; ctx.shadowBlur = blur; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.restore(); }
+function glowText(text, x, y, size, color, blur, weight = 800) { ctx.save(); ctx.font = `${weight} ${size}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.shadowColor = color; ctx.shadowBlur = blur; ctx.fillStyle = color; ctx.fillText(text, x, y); ctx.restore(); }
+
+function renderFrame(t) {
+  ctx.fillStyle = C.bg; ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  // Grelha em perspetiva no fundo inferior, a deslizar para a câmara
+  const hz = 1150; ctx.save(); ctx.beginPath(); ctx.rect(0, hz, WIDTH, HEIGHT - hz); ctx.clip();
+  ctx.strokeStyle = C.dim; ctx.lineWidth = 2;
+  for (let k = -8; k <= 8; k++) { ctx.beginPath(); ctx.moveTo(WIDTH / 2 + k * 60, hz); ctx.lineTo(WIDTH / 2 + k * 420, HEIGHT); ctx.stroke(); }
+  for (let k = 0; k < 14; k++) { const z = ((k + t * 1.2) % 14) / 14, y = hz + Math.pow(z, 2.2) * (HEIGHT - hz); ctx.globalAlpha = z; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(WIDTH, y); ctx.stroke(); }
+  ctx.restore();
+  // Vinheta
+  const g = ctx.createRadialGradient(WIDTH / 2, 800, 200, WIDTH / 2, 800, 1300); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,0.7)'); ctx.fillStyle = g; ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+  // Partículas que sobem devagar (120, determinísticas)
+  for (let i = 0; i < 120; i++) {
+    const x = hash(i) * WIDTH, speed = 40 + hash(i, 1) * 90, y = (hash(i, 2) * HEIGHT - t * speed + HEIGHT * 10) % HEIGHT;
+    const s = 1.5 + hash(i, 3) * 3, a = 0.25 + 0.5 * hash(i, 4) * (0.5 + 0.5 * Math.sin(t * 3 + i));
+    ctx.fillStyle = `rgba(255,191,0,${a})`; ctx.beginPath(); ctx.arc(x, y, s, 0, 6.28); ctx.fill();
+  }
+
+  // Linhas luminosas que se desenham do centro para fora (0–1 s)
+  const L = easeInOut(seg(t, 0.1, 0.9));
+  glowLine(WIDTH / 2 - 420 * L, 760, WIDTH / 2 + 420 * L, 760, C.yellow, 4, 24);
+  glowLine(WIDTH / 2 - 300 * L, 1010, WIDTH / 2 + 300 * L, 1010, C.yellow, 2, 16);
+
+  // Contador numérico que sobe (tabular) com label; brilho mais forte quando chega ao fim
+  const cnt = easeOut(seg(t, 0.4, 1.6)), value = Math.round(120 * cnt);
+  const settle = seg(t, 2.0, 0.3);
+  glowText(`+${value}`, WIDTH / 2, 885, 260, C.white, 20 + 40 * settle * (1 - settle), 900);
+  const lab = easeOut(seg(t, 1.0, 0.5));
+  ctx.save(); ctx.globalAlpha = lab; glowText('PROJETOS ENTREGUES', WIDTH / 2, 1070 + (1 - lab) * 20, 44, C.yellow, 12, 700); ctx.restore();
+  // Varrimento de luz sobre o número (2,3–3,0 s): o número é redesenhado com um gradiente móvel como
+  // preenchimento, por isso a luz só existe dentro dos glifos (um retângulo em 'lighter' mancharia o fundo).
+  const sw = seg(t, 2.3, 0.7);
+  if (sw > 0 && sw < 1) { ctx.save(); const x = WIDTH / 2 - 500 + sw * 1000;
+    const lg = ctx.createLinearGradient(x - 140, 0, x + 140, 0); lg.addColorStop(0, 'rgba(255,255,255,0)'); lg.addColorStop(0.5, 'rgba(255,255,255,0.85)'); lg.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.font = `900 260px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = lg; ctx.fillText(`+${value}`, WIDTH / 2, 885); ctx.restore(); }
+
+  // Caixa de "terminal" no fundo com texto que se escreve (typewriter determinístico)
+  const code = '> deploy --prod  ✓ 0.8s';
+  const n = Math.floor(seg(t, 2.6, 1.0) * code.length);
+  if (n > 0) { ctx.save(); ctx.fillStyle = 'rgba(255,255,255,0.06)'; ctx.fillRect(140, 1420, 800, 110); ctx.strokeStyle = C.dim; ctx.strokeRect(140, 1420, 800, 110);
+    ctx.font = `600 40px "DejaVu Sans Mono", monospace`; ctx.textBaseline = 'middle'; ctx.fillStyle = C.white; ctx.fillText(code.slice(0, n) + (Math.floor(t * 3) % 2 ? '▌' : ''), 180, 1475); ctx.restore(); }
+}
+let start = performance.now();
+(function loop(now) { renderFrame(((now - start) / 1000) % DURATION_S); requestAnimationFrame(loop); })(start);
+</script></body></html>
