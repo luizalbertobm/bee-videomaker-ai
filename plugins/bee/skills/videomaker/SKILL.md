@@ -9,11 +9,13 @@ Fluxo para produzir um vídeo curto com o mínimo de créditos gastos: tudo o qu
 
 ## Onde está cada coisa
 
-Esta skill vem do plugin `bee` (invocação `/bee:videomaker`, diagnóstico `/bee:doctor`); os scripts e modelos vivem na pasta do plugin (`${CLAUDE_PLUGIN_ROOT}/skills/videomaker/`, já substituída nos comandos abaixo) e os ficheiros do projeto nas pastas da raiz do projeto. Na primeira utilização num projeto, correr o diagnóstico e criar as pastas em falta:
+Esta skill vem do plugin `bee` (invocação `/bee:videomaker`, diagnóstico `/bee:doctor`); os scripts e modelos vivem na pasta do plugin (`${CLAUDE_PLUGIN_ROOT}/skills/videomaker/`, já substituída nos comandos abaixo) e os ficheiros do projeto nas pastas da raiz do projeto. Na primeira utilização num projeto (ainda sem `.videomaker/setup.json`), a preparação faz-se com `/bee:doctor`, que guia passo a passo: ferramentas do sistema, pacotes Python, Chrome, pastas, logos e fontes, chave de stock, conectores e um teste real da cadeia. Se o utilizador pedir um vídeo antes disso, correr o diagnóstico e, havendo obrigatórios em falta, propor o `/bee:doctor` antes de avançar:
 
 ```bash
 bash ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/doctor.sh
 ```
+
+`doctor.sh --smoke` testa a cadeia de ponta a ponta (cena → MP4, ícone, efeitos, montagem) numa pasta temporária; útil quando um render falha sem razão aparente.
 
 Caminhos do projeto, relativos à sua raiz:
 

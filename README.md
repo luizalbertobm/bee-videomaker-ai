@@ -9,7 +9,7 @@ Plugin para Claude Code que produz reels e vídeos curtos de ponta a ponta, gast
 - **Stock gratuito** (Pixabay, Openverse) com ficheiro de créditos automático.
 - **Montagem ffmpeg** com normalização, música de fundo com ducking e legendas.
 
-Invoca-se com `/bee:videomaker` (ou basta pedir um vídeo); `/bee:doctor` verifica as dependências.
+Invoca-se com `/bee:videomaker` (ou basta pedir um vídeo); `/bee:doctor` verifica as dependências e, na primeira execução num projeto, guia a preparação passo a passo.
 
 ## Instalar
 
@@ -18,14 +18,14 @@ claude plugin marketplace add luizalbertobm/bee-videomaker-ai
 claude plugin install bee@bee-videomaker-ai --scope project   # ou --scope user
 ```
 
-Depois, no projeto: `/bee:doctor`.
+Depois, no projeto: `/bee:doctor`. Na primeira vez é um assistente guiado: ferramentas do sistema, pacotes Python, Chrome, pastas, logos e fontes, chave de stock, conectores e um teste real da cadeia. Nas seguintes é um relatório rápido; `/bee:doctor guiado` repete o assistente.
 
 ## O que o projeto precisa
 
 - `sources/logos/` com os logos da marca (SVG de preferência) e `sources/fonts/` com as fontes `.ttf` (`display.ttf`, `body.ttf`, ou ajustar `FONT_FACES` nos modelos).
 - Opcional: `sources/identidade-visual.md` com o resumo do manual da marca; `.env` com `PIXABAY_API_KEY` para stock de vídeo.
 - Conector ElevenLabs ligado ao Claude (tools `creative_*`); Higgsfield opcional para imagens e vídeo gerados.
-- Localmente: ffmpeg, bc, Python 3 com `playwright`, `faster-whisper` e `pillow`, Google Chrome.
+- Localmente: ffmpeg, bc, Python 3 com `playwright`, `numpy` e `faster-whisper` (`pillow` opcional), Google Chrome.
 
 ## Estrutura
 

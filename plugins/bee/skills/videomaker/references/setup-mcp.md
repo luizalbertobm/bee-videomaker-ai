@@ -23,9 +23,11 @@ Depois, dentro de uma sessão interativa do Claude Code, correr `/mcp` e conclui
 
 ## Dependências locais
 
+O `/bee:doctor` verifica tudo isto e, na primeira execução num projeto, guia a instalação passo a passo com o comando certo para o sistema. À mão, em Debian/Ubuntu:
+
 ```bash
 sudo apt install ffmpeg bc
-pip install playwright
+pip install playwright numpy
 # Google Chrome já instalado é suficiente (render usa channel="chrome"); alternativa:
 # playwright install chromium
 

@@ -1,7 +1,7 @@
 {
   "name": "bee",
   "displayName": "Bee Videomaker AI",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Produz reels e vídeos curtos de ponta a ponta: roteiro, cenas Canvas renderizadas localmente (3 estilos, logo animado), pacote completo de ícones Lucide (2.356 SVG, offline), biblioteca de efeitos sonoros CC0 (Kenney Interface Sounds + sons base), narração e música via ElevenLabs, stock gratuito, transcrição local e montagem ffmpeg.",
   "author": {
     "name": "luizalbertobm",
@@ -23,7 +23,7 @@
   "commands": {
     "doctor": {
       "source": "./commands/doctor.md",
-      "description": "Verifica dependências locais da skill videomaker (ffmpeg, Chrome, playwright, faster-whisper, fontes, chaves)"
+      "description": "Verifica o que a skill videomaker precisa; na primeira execução num projeto, guia a preparação passo a passo (ferramentas, pacotes, Chrome, pastas, logos e fontes, stock, conectores, teste final)"
     }
   },
   "repository": "https://github.com/luizalbertobm/bee-videomaker-ai"
