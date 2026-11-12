@@ -6,7 +6,7 @@ Plugin para Claude Code que produz reels e vídeos curtos de ponta a ponta, gast
 - **Cenas em Canvas** renderizadas localmente (Chrome headless + ffmpeg), em três estilos prontos: tipografia cinética, motion graphics geométrico e tech escuro com brilho. Pacote completo de ícones [Lucide](https://lucide.dev) incluído (2.356 SVG, funciona offline) com traço que se desenha; logo em SVG animado por camadas.
 - **Narração e música** pelo conector ElevenLabs ligado ao Claude; **transcrição local** gratuita com faster-whisper (legendas por palavra).
 - **Efeitos sonoros CC0** incluídos: nove sons base e o pacote [Kenney Interface Sounds](https://kenney.nl/assets/interface-sounds) (100 sons de UI), sincronizados com a animação por uma folha de deixas.
-- **Stock gratuito** (Pixabay, Pexels, Openverse) com ficheiro de créditos automático.
+- **Stock gratuito** (Pixabay, Openverse) com ficheiro de créditos automático.
 - **Montagem ffmpeg** com normalização, música de fundo com ducking e legendas.
 
 Invoca-se com `/bee:videomaker` (ou basta pedir um vídeo); `/bee:doctor` verifica as dependências.

@@ -41,15 +41,13 @@ Fontes: [Higgsfield MCP](https://higgsfield.ai/mcp) · [ElevenLabs hosted MCP](h
 
 ## Chaves dos bancos de stock (scripts/stock.py)
 
-Ambas gratuitas, obtidas em segundos com uma conta:
+Só o Pixabay precisa de chave, gratuita e obtida em segundos com uma conta. O Pexels foi retirado: a emissão de chaves novas está suspensa (confirmado na página oficial a 12/11/2026) e sem chave a API responde 401.
 
-- Pexels: https://www.pexels.com/api/ — **emissão de chaves novas pausada desde ~30/09/2026**, sem data para reabrir (confirmado na página oficial e no help center a 10/11/2026). Quem já tem chave mantém 200 pedidos/hora, 20.000/mês. Deixar `PEXELS_API_KEY` vazio se não tiver.
 - Pixabay: https://pixabay.com/api/docs/ → a chave aparece na própria página depois do login. Limite 100 pedidos/min; o Pixabay exige cache de 24 h, que o script faz em `~/.cache/videomaker/stock/`.
 - Openverse: sem chave. Limite anónimo baixo; para mais, registar em https://api.openverse.org/v1/#tag/auth.
 
 Guardar num ficheiro `.env` na raiz do projeto (não o pôr em git):
 
 ```
-PEXELS_API_KEY=xxxxxxxx
 PIXABAY_API_KEY=xxxxxxxx
 ```

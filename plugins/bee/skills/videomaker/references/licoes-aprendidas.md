@@ -35,7 +35,7 @@ Ler antes de estimar custos, gerar áudio/vídeo ou montar. Acrescentar uma linh
 - `LC_ALL=C` no script: com locale em vírgula decimal, `awk` escreve "18,38" e o ffmpeg lê dois filtros.
 
 ## Stock e ícones
-- Pexels e Pixabay são os únicos bancos de vídeo gratuito com API; o Pexels deixou de emitir chaves novas em set. 2026, por isso o Pixabay é a fonte prática de vídeo. Openverse (imagens CC e sons do Freesound) não precisa de chave mas devolve 502/504 de vez em quando; fotos do Flickr vêm com 1024 px no máximo.
+- O Pixabay é a única fonte de vídeo gratuito com API utilizável: o Pexels suspendeu a emissão de chaves novas e foi retirado da skill. A API de vídeo do Pixabay ignora `orientation` (o script filtra localmente) e as imagens chegam com no máximo 1280 px no lado maior. Openverse (imagens CC e sons do Freesound) não precisa de chave mas devolve 502/504 de vez em quando; fotos do Flickr vêm com 1024 px no máximo.
 - Licenças CC BY-SA obrigam a publicar o vídeo com a mesma licença; preferir CC0 ou CC BY. Entregar sempre `creditos.md`.
 - Ícones: Lucide (ISC) via `icons.py`; `qr-code` serve para Pix. Em ícones pequenos ao lado de texto bold, `lineWidth` 2,2–3.
 
