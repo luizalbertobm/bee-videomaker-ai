@@ -1,4 +1,4 @@
-# bee-video-pipeline
+# Bee Videomaker AI
 
 Plugin para Claude Code que produz reels e vídeos curtos de ponta a ponta, gastando o mínimo de créditos:
 
@@ -13,8 +13,8 @@ Invoca-se com `/bee:video-pipeline` (ou basta pedir um vídeo); `/bee:doctor` ve
 ## Instalar
 
 ```bash
-claude plugin marketplace add luizalbertobm/bee-video-pipeline
-claude plugin install bee@bee-plugins --scope project   # ou --scope user
+claude plugin marketplace add luizalbertobm/bee-videomaker-ai
+claude plugin install bee@bee-videomaker-ai --scope project   # ou --scope user
 ```
 
 Depois, no projeto: `/bee:doctor`.
