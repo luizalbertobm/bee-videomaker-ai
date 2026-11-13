@@ -4,6 +4,7 @@ Plugin para Claude Code que produz reels e vídeos curtos de ponta a ponta, gast
 
 - **Roteiro por cenas** com aprovação antes de qualquer operação paga.
 - **Cenas em Canvas** renderizadas localmente (Chrome headless + ffmpeg), em três estilos prontos: tipografia cinética, motion graphics geométrico e tech escuro com brilho. Pacote completo de ícones [Lucide](https://lucide.dev) incluído (2.356 SVG, funciona offline) com traço que se desenha; logo em SVG animado por camadas.
+- **Mockups de portátil e telemóvel** em perspetiva (só Canvas, sem imagem gerada) com a página de um site a fazer scroll no ecrã; `capture_site.py` tira a foto da página inteira (recusa o aviso de cookies, carrega imagens lazy) e uma loja genérica serve de exemplo antes de haver captura.
 - **Narração e música** pelo conector ElevenLabs ligado ao Claude; **transcrição local** gratuita com faster-whisper (legendas por palavra).
 - **Efeitos sonoros CC0** incluídos: nove sons base e o pacote [Kenney Interface Sounds](https://kenney.nl/assets/interface-sounds) (100 sons de UI), sincronizados com a animação por uma folha de deixas.
 - **Stock gratuito** (Pixabay, Openverse) com ficheiro de créditos automático.

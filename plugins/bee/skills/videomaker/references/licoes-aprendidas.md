@@ -62,3 +62,10 @@ Ler antes de estimar custos, gerar áudio/vídeo ou montar. Acrescentar uma linh
 - Séries (ícones a entrar, barras de gráfico) soam melhor com o mesmo som a subir de altura (`pitch` 1 → 1,12 → 1,26) ou alternando variações numeradas do pacote Kenney.
 - O que leva som: entradas e saídas do objeto principal (whoosh, maximize/minimize), trocas de bloco (swish), toque em botão (click), confirmações (confirmation, glock), elementos em série (pops), texto a ser escrito (ticks), brilhos (shimmer ou glass, baixo). Texto que só aparece com fade não precisa de som.
 
+## Mockups de dispositivos (devices.js, capture_site.py)
+- Portátil e telemóvel são um modelo 3D mínimo projetado à mão (yaw/pitch/tilt/roll) e um ecrã deformado por uma malha de triângulos afins a partir de um canvas auxiliar com a página capturada; o Canvas 2D só faz transformações afins, mas com células pequenas (16×10 no portátil, 10×20 no telemóvel) o conjunto lê-se como perspetiva contínua.
+- Cada triângulo tem de se sobrepor ~1 px ao vizinho e o ecrã tem de ser pintado antes com a cor de fundo da página, senão ficam costuras diagonais nas arestas da malha.
+- `capture_site.py` tira a foto da página inteira (não só o que cabe na janela): recusa o aviso de cookies por um botão "Recusar"/"Rejeitar", rola a página devagar para as imagens lazy carregarem, volta ao topo e desliga animações antes da captura. 1280 px a 1,5× dá uma imagem de ~1920 px de largura para o portátil; 390 px a 2× com user agent de telemóvel dá ~780 px para o telemóvel.
+- A captura mostra tudo o que o site tem, incluindo secções que o roteiro não deva exibir: escolher o intervalo de scroll (ou `--hide "seletor"`) em função disso, e só capturar sites com autorização.
+- `Devices.placeholderPage()` desenha uma loja genérica para ensaiar e aprovar a animação antes de haver site ou autorização para o mostrar.
+
