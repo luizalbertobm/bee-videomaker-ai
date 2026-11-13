@@ -1,7 +1,7 @@
 {
   "name": "bee",
   "displayName": "Bee Videomaker AI",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Produz reels e vídeos curtos de ponta a ponta: roteiro, cenas Canvas renderizadas localmente (3 estilos, logo animado), mockups de portátil e telemóvel em perspetiva com a página do site a fazer scroll, pacote completo de ícones Lucide (2.356 SVG, offline), biblioteca de efeitos sonoros CC0 (Kenney Interface Sounds + sons base), narração e música via ElevenLabs, stock gratuito, transcrição local, montagem ffmpeg com volume normalizado e um agente revisor de qualidade (revisor-video).",
   "author": {
     "name": "luizalbertobm",

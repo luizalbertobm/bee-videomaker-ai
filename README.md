@@ -9,6 +9,7 @@ Plugin para Claude Code que produz reels e vídeos curtos de ponta a ponta, gast
 - **Efeitos sonoros CC0** incluídos: nove sons base e o pacote [Kenney Interface Sounds](https://kenney.nl/assets/interface-sounds) (100 sons de UI), sincronizados com a animação por uma folha de deixas.
 - **Stock gratuito** (Pixabay, Openverse) com ficheiro de créditos automático.
 - **Montagem ffmpeg** com normalização, música de fundo com ducking e legendas.
+- **Análise de vídeos de referência** (`referencia.py`): a partir de um link (via [yt-dlp](https://github.com/yt-dlp/yt-dlp)) ou ficheiro, gera uma ficha de ritmo — planos, cortes por 10 s, palavras por segundo, gancho dos primeiros 3 s, loudness, folha de frames — para o roteiro seguir um ritmo que já funciona. Só para estudo: nada da referência entra no vídeo.
 - **Revisor de qualidade** (agente `revisor-video`, só leitura): antes da entrega, mede formato, frames vazios, zona segura, áudio e a voz contra o roteiro, e devolve um veredicto com a prova de cada problema — sem alterar ficheiros nem gastar créditos.
 
 Invoca-se com `/bee:videomaker` (ou basta pedir um vídeo); `/bee:doctor` verifica as dependências e, na primeira execução num projeto, guia a preparação passo a passo.
@@ -27,7 +28,7 @@ Depois, no projeto: `/bee:doctor`. Na primeira vez é um assistente guiado: ferr
 - `sources/logos/` com os logos da marca (SVG de preferência) e `sources/fonts/` com as fontes `.ttf` (`display.ttf`, `body.ttf`, ou ajustar `FONT_FACES` nos modelos).
 - Opcional: `sources/identidade-visual.md` com o resumo do manual da marca; `.env` com `PIXABAY_API_KEY` para stock de vídeo.
 - Conector ElevenLabs ligado ao Claude (tools `creative_*`); Higgsfield opcional para imagens e vídeo gerados.
-- Localmente: ffmpeg, bc, Python 3 com `playwright`, `numpy` e `faster-whisper`, Google Chrome.
+- Localmente: ffmpeg, bc, Python 3 com `playwright`, `numpy` e `faster-whisper`, Google Chrome. Opcional: `yt-dlp` para analisar vídeos de referência por link.
 
 ## Estrutura
 
@@ -44,7 +45,7 @@ plugins/bee/
                         icons/ (pacote Lucide completo), sfx/ (sons base + kenney-interface/)
     references/         estilos de animação, lições aprendidas, setup dos conectores e chaves
     scripts/            render_canvas.py, transcribe.py, stock.py, icons.py, sfx_track.py, capture_site.py,
-                        contact_sheet.py, montagem.ffmpeg.sh, doctor.sh
+                        referencia.py, contact_sheet.py, montagem.ffmpeg.sh, doctor.sh
 ```
 
 ## Licença

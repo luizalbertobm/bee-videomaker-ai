@@ -13,6 +13,7 @@ model: sonnet
 - `ROTEIRO`: o roteiro com o texto exato de cada cena e as durações.
 - `SCENES` e `AUDIO`: as pastas da produção (`scenes/NN.mp4`, `audio/NN.mp3`); `SFX`: a folha de deixas e a faixa de efeitos, se houver.
 - `SCRIPTS`: a pasta de scripts da skill (`.../skills/videomaker/scripts`). Se faltar, procurar com `find ~/.claude/plugins /home -path '*skills/videomaker/scripts/contact_sheet.py' 2>/dev/null | head -1`.
+- `REFERENCIA` (opcional): a `ficha.json` de um vídeo de referência analisado com `referencia.py`, para comparar o ritmo.
 - Formato esperado (por omissão reel 1080×1920, 30 fps), restrições do cliente (ex. "não anunciar entregas") e uma imagem de referência de estilo, se existir.
 
 Se faltar o vídeo ou o roteiro, para e diz o que falta.
@@ -64,6 +65,12 @@ ffmpeg -v error -y -i "$VIDEO" -vn -ac 1 -ar 16000 build/revisao/audio.wav
 python3 "$SCRIPTS/transcribe.py" build/revisao/audio.wav --language pt --out-dir build/revisao --initial-prompt "<nomes próprios do roteiro>"
 ```
 Comparar palavra a palavra com o texto do roteiro: palavras em falta, trocadas ou repetidas, frases cortadas na troca de cena, nomes próprios mal lidos (a transcrição é um indício; marcar como "verificar a ouvir"). Com os tempos por palavra do JSON (`words` no topo), escolher as palavras-chave de cada título e tirar uma folha nesses instantes (+0,2 s): o texto correspondente tem de estar visível quando a palavra é dita, nem 1 s antes nem depois.
+
+### 5b. Ritmo contra a referência (só se houver `REFERENCIA`)
+```bash
+python3 "$SCRIPTS/referencia.py" "$VIDEO" --out-dir build/revisao/ritmo --no-transcribe
+```
+Comparar `build/revisao/ritmo/ficha.json` com a da referência: plano médio, cortes por 10 s, primeiro corte, cortes nos 3 s, palavras/s (do passo 5) e loudness. Diferenças grandes (ex. plano médio o dobro) vão para SUGESTÕES, não para BLOQUEANTES: a referência orienta, não obriga. Se o nosso vídeo usa transições animadas, contar as cenas pela folha em vez dos cortes detetados.
 
 ### 6. Conteúdo e entrega
 - Restrições do cliente: procurar o tema proibido em todo o lado — narração, títulos, ícones, rótulos, estados, texto pequeno dentro de interfaces.

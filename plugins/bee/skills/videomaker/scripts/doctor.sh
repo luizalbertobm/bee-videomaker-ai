@@ -70,6 +70,7 @@ if has python3; then add python3 sistema 1 ok "python3" "$(python3 --version 2>&
 # 2. pacotes Python
 pymod playwright && add playwright python 1 ok "playwright (Python)" "" "" || add playwright python 1 missing "playwright (Python)" "comanda o Chrome para desenhar cada frame das cenas Canvas" "$PIP playwright"
 pymod numpy && add numpy python 1 ok "numpy" "" "" || add numpy python 1 missing "numpy" "mistura a faixa de efeitos sonoros (sfx_track.py)" "$PIP numpy"
+pymod yt_dlp && add yt-dlp python 0 ok "yt-dlp" "$(python3 -m yt_dlp --version 2>/dev/null)" "" || add yt-dlp python 0 missing "yt-dlp" "opcional: descarrega vídeos de referência para o referencia.py (manter atualizado)" "$PIP -U yt-dlp"
 pymod faster_whisper && add faster-whisper python 1 ok "faster-whisper" "" "" || add faster-whisper python 1 missing "faster-whisper" "transcrição local e legendas (o modelo large-v3, ~3 GB, é descarregado no primeiro uso)" "$PIP faster-whisper"
 
 # 3. Chrome
