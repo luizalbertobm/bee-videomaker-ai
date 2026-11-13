@@ -4,6 +4,8 @@
 # Formato/fps/qualidade por ambiente: W=1920 H=1080 FPS=30 CRF=18 bash ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/montagem.ffmpeg.sh saida.mp4
 # Música de fundo: musica.mp3 na raiz (ou MUSIC=ficheiro), volume MUSIC_VOL (0.35 por omissão), com ducking sob a narração.
 # Efeitos sonoros: SFX=faixa.wav (feita por sfx_track.py a partir de uma folha de deixas), volume SFX_VOL (1 por omissão).
+# Volume final: normalizado a LUFS=-14 (integrado, alvo de Instagram/TikTok/YouTube) com pico verdadeiro ≤ TP=-1.5 dBTP,
+# em duas passagens de loudnorm; LUFS=0 desliga.
 #
 # Estrutura esperada:
 #   scenes/NN.mp4|webm|png|jpg   cena NN (Canvas já renderizado por ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/render_canvas.py, ou Higgsfield)
@@ -75,6 +77,20 @@ if [[ -n "$SFX" && -f "$SFX" ]]; then
     "[1:a]volume=${SFX_VOL}[fx];[0:a][fx]amix=inputs=2:duration=first:dropout_transition=0:normalize=0,alimiter=limit=0.95[a]" \
     -map 0:v:0 -map "[a]" -c:v copy "${AENC[@]}" -ac 2 build/sfx.mp4
   STAGE=build/sfx.mp4; echo "efeitos: $SFX (vol $SFX_VOL)"
+fi
+
+LUFS="${LUFS:--14}"; TP="${TP:--1.5}"
+if [[ "$LUFS" != "0" ]]; then
+  # 1.ª passagem mede, 2.ª aplica um ganho linear (sem compressão dinâmica) com os valores medidos
+  m=$(ffmpeg -hide_banner -i "$STAGE" -vn -af "loudnorm=I=$LUFS:TP=$TP:LRA=11:print_format=json" -f null - 2>&1 \
+      | python3 -c 'import sys,json; t=sys.stdin.read(); d=json.loads(t[t.rindex("{"):]); print(d["input_i"], d["input_tp"], d["input_lra"], d["input_thresh"], d["target_offset"])')
+  read -r mi mtp mlra mth off <<< "$m"
+  ch=$(ffprobe -v error -select_streams a:0 -show_entries stream=channels -of csv=p=0 "$STAGE")
+  vd=$(ffprobe -v error -select_streams v:0 -show_entries stream=duration -of csv=p=0 "$STAGE")   # o loudnorm alonga o áudio ~0,1 s; -shortest com -c:v copy cortava 3 s
+  ffmpeg -y -loglevel error -i "$STAGE" -af \
+    "loudnorm=I=$LUFS:TP=$TP:LRA=11:measured_I=$mi:measured_TP=$mtp:measured_LRA=$mlra:measured_thresh=$mth:offset=$off:linear=true,atrim=0:$vd" \
+    -map 0:v:0 -map 0:a:0 -c:v copy "${AENC[@]}" -ac "$ch" build/loud.mp4
+  STAGE=build/loud.mp4; echo "volume: $mi LUFS -> $LUFS LUFS (pico ≤ $TP dBTP)"
 fi
 
 # Legendas (se existirem)

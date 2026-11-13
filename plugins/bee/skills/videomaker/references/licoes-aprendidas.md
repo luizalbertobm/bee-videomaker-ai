@@ -33,6 +33,7 @@ Ler antes de estimar custos, gerar áudio/vídeo ou montar. Acrescentar uma linh
 - Narração mais curta que a cena cortava o vídeo por `-shortest`; agora `-af apad`.
 - Música de fundo: `musica.mp3` na raiz, volume `MUSIC_VOL`, ducking por `sidechaincompress`, mistura em estéreo.
 - `LC_ALL=C` no script: com locale em vírgula decimal, `awk` escreve "18,38" e o ffmpeg lê dois filtros.
+- Volume final normalizado a `LUFS=-14` (alvo de Instagram/TikTok/YouTube) e pico verdadeiro ≤ `TP=-1.5` dBTP, em duas passagens de `loudnorm` (a 1.ª mede, a 2.ª aplica um ganho linear com os valores medidos, sem compressão dinâmica); `LUFS=0` desliga. O `loudnorm` alonga o áudio ~0,1 s, o que com `-shortest` e `-c:v copy` cortava 3 s do fim do vídeo: a faixa tem de se cortar com `atrim` pela duração do vídeo, não pelo `-shortest`.
 
 ## Stock e ícones
 - O Pixabay é a única fonte de vídeo gratuito com API utilizável: o Pexels suspendeu a emissão de chaves novas e foi retirado da skill. A API de vídeo do Pixabay ignora `orientation` (o script filtra localmente) e as imagens chegam com no máximo 1280 px no lado maior. Openverse (imagens CC e sons do Freesound) não precisa de chave mas devolve 502/504 de vez em quando; fotos do Flickr vêm com 1024 px no máximo.
