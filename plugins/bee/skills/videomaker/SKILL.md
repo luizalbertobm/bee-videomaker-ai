@@ -167,7 +167,18 @@ O script normaliza cada cena para o mesmo formato (padding, fps), cola `audio/NN
 
 ### 6. Revisão
 
-Perguntar sobre ritmo, voz, estilo visual e texto. Regenerar só as cenas alteradas (nunca o vídeo inteiro) e voltar a correr a montagem — é por isso que cada cena vive no seu próprio ficheiro.
+Antes de mostrar o vídeo ao utilizador, passá-lo ao agente **`revisor-video`** do plugin (ferramenta Agent, `subagent_type: "bee:revisor-video"`). Ele não viu a produção, por isso apanha o que o autor deixa passar, e as folhas de frames, medições e transcrições ficam no contexto dele: devolve só o veredicto e a lista de problemas com instante, prova e correção. Só lê e mede; não altera ficheiros nem gasta créditos. No pedido, dar-lhe tudo o que precisa, porque não vê esta conversa:
+
+```text
+VIDEO=reel-x.mp4  ROTEIRO=roteiro-x.md  SCENES=scenes/x  AUDIO=audio/x  SFX=scenes/x/sfx.tsv
+SCRIPTS=${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts
+Formato: 1080×1920, 30 fps, 25 s. Restrições do cliente: <ex. não anunciar entregas>. Referência de estilo: <caminho ou "nenhuma">.
+Fronteiras de cena e trocas de bloco: <instantes globais>.
+```
+
+Corrigir os bloqueantes e o que for "a corrigir" antes de entregar, conferindo cada ponto (o agente também erra); ao utilizador, dizer o que o revisor encontrou e o que ficou por verificar (o som nunca é ouvido, só medido). Se o agente não estiver disponível na sessão, fazer as mesmas verificações à mão seguindo `${CLAUDE_PLUGIN_ROOT}/agents/revisor-video.md`.
+
+Depois, perguntar ao utilizador sobre ritmo, voz, estilo visual e texto. Regenerar só as cenas alteradas (nunca o vídeo inteiro) e voltar a correr a montagem — é por isso que cada cena vive no seu próprio ficheiro.
 
 ## Regras
 

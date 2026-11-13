@@ -8,14 +8,17 @@ Uso (a partir da raiz do projeto):
   python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/contact_sheet.py scenes/03.mp4 --times 0,0.4,1.25,2.9  # instantes exatos
   python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/contact_sheet.py scenes/0*.mp4 --frames 5         # uma linha por cena
   python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/contact_sheet.py stock/thumbs/*.jpg --cols 6      # imagens soltas, uma por célula
+  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/contact_sheet.py final.mp4 --frames 12 --safe       # linhas da zona segura de reel
 
 Os frames de cada vídeo vão do primeiro ao último, igualmente espaçados; cada célula leva o nome do ficheiro e o
 instante em segundos, para cruzar com o código da cena (renderFrame(t)). Saída por omissão: <primeiro>_folha.png
 (ou --out). Ler a imagem resultante em vez de abrir o vídeo: apanha textos fora das caixas, elementos cortados,
-frames vazios e saltos entre cenas.
+frames vazios e saltos entre cenas. --safe desenha a zona segura de reel 9:16 (linhas a y=120 e y=1500 numa
+altura de 1920, proporcionais noutras): o que importa tem de ficar entre as duas.
 """
 import argparse, json, pathlib, shutil, subprocess, sys, tempfile
 
+SAFE = (120 / 1920, 1500 / 1920)   # topo e fundo da zona segura de reel, em fração da altura
 IMG_EXT = {'.png', '.jpg', '.jpeg', '.webp', '.bmp', '.gif'}
 
 
@@ -36,7 +39,7 @@ def esc(text):
     return text.replace('\\', '\\\\').replace("'", "’").replace(':', '\\:').replace('%', '\\%')
 
 
-def grab(src, t, dest, w, h, label, use_label):
+def grab(src, t, dest, w, h, label, use_label, safe=False):
     """Um frame de src no instante t (None = imagem), encaixado em w x h sem deformar.
     Imagens compõem-se sobre cinzento médio, para as transparências de PNG (logos pretos ou brancos) se lerem;
     vídeos não têm alfa e levam só barras escuras (a composição com uma fonte de cor perdia frames após o -ss)."""
@@ -45,7 +48,10 @@ def grab(src, t, dest, w, h, label, use_label):
         fc = (f'color=c=0x808080:s={w}x{h}:d=1[bg];[0:v]{fit},format=rgba[fg];'
               f'[bg][fg]overlay=(W-w)/2:(H-h)/2:shortest=1')
     else:
-        fc = f'[0:v]{fit},pad={w}:{h}:(ow-iw)/2:(oh-ih)/2:color=0x202020'
+        fc = '[0:v]'
+        if safe:   # zona segura de reel, desenhada no frame original antes de reduzir
+            fc += ''.join(f"drawbox=x=0:y=ih*{f}-2:w=iw:h=4:color=0xff3b30@0.85:t=fill," for f in SAFE)
+        fc += f'{fit},pad={w}:{h}:(ow-iw)/2:(oh-ih)/2:color=0x202020'
     if use_label and label:
         fs = max(12, w // 18)
         fc += (f",drawtext=text='{esc(label)}':font=Sans:fontsize={fs}:fontcolor=white:"
@@ -66,6 +72,7 @@ def main():
     ap.add_argument('--width', type=int, default=320, help='largura de cada célula em px (320)')
     ap.add_argument('--out', help='ficheiro de saída .png ou .jpg')
     ap.add_argument('--no-labels', action='store_true', help='sem nome e instante em cada célula')
+    ap.add_argument('--safe', action='store_true', help='linhas vermelhas da zona segura de reel (y=120 e y=1500 em 1920)')
     a = ap.parse_args()
     if not shutil.which('ffmpeg') or not shutil.which('ffprobe'): sys.exit('[erro] precisa de ffmpeg e ffprobe')
 
@@ -105,13 +112,13 @@ def main():
         tmp = pathlib.Path(tmp); use_label = not a.no_labels; warned = False
         for k, (src, t, label) in enumerate(cells):
             dest = tmp / f'{k:04d}.png'
-            ok, err = grab(src, t, dest, cw, ch, label, use_label)
+            ok, err = grab(src, t, dest, cw, ch, label, use_label, a.safe)
             if not ok and t is not None and t > 0:   # instante no limite do ficheiro: recuar meio frame
-                ok, err = grab(src, max(0.0, t - 0.5 / 30), dest, cw, ch, label, use_label)
+                ok, err = grab(src, max(0.0, t - 0.5 / 30), dest, cw, ch, label, use_label, a.safe)
             if not ok and use_label and ('drawtext' in err or 'font' in err.lower()):   # ffmpeg sem freetype/fontconfig
                 use_label = False
                 if not warned: print('[aviso] ffmpeg sem drawtext utilizável; folha sem rótulos', file=sys.stderr); warned = True
-                ok, err = grab(src, t, dest, cw, ch, label, False)
+                ok, err = grab(src, t, dest, cw, ch, label, False, a.safe)
             if not ok: sys.exit(f'[erro] frame {t if t is not None else ""} de {src}: {err or "o ffmpeg não devolveu imagem"}')
         for k in range(len(cells), rows * cols):  # completar a última linha
             subprocess.run(['ffmpeg', '-v', 'error', '-y', '-f', 'lavfi', '-i', f'color=c=0x202020:s={cw}x{ch}',

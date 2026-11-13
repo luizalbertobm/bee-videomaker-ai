@@ -9,6 +9,7 @@ Plugin para Claude Code que produz reels e vídeos curtos de ponta a ponta, gast
 - **Efeitos sonoros CC0** incluídos: nove sons base e o pacote [Kenney Interface Sounds](https://kenney.nl/assets/interface-sounds) (100 sons de UI), sincronizados com a animação por uma folha de deixas.
 - **Stock gratuito** (Pixabay, Openverse) com ficheiro de créditos automático.
 - **Montagem ffmpeg** com normalização, música de fundo com ducking e legendas.
+- **Revisor de qualidade** (agente `revisor-video`, só leitura): antes da entrega, mede formato, frames vazios, zona segura, áudio e a voz contra o roteiro, e devolve um veredicto com a prova de cada problema — sem alterar ficheiros nem gastar créditos.
 
 Invoca-se com `/bee:videomaker` (ou basta pedir um vídeo); `/bee:doctor` verifica as dependências e, na primeira execução num projeto, guia a preparação passo a passo.
 
@@ -35,13 +36,15 @@ Depois, no projeto: `/bee:doctor`. Na primeira vez é um assistente guiado: ferr
 plugins/bee/
   .claude-plugin/plugin.json, icon.png
   commands/doctor.md
+  agents/revisor-video.md     revisor de qualidade só de leitura, chamado na etapa 6
   skills/videomaker/
     SKILL.md            fluxo em 6 etapas, regras, onde está cada coisa
     assets/             template de cena, 3 demos de estilo, helper de ícones, modelo de roteiro,
+                        devices.js + mockup-demo.html (mockups de portátil/telemóvel),
                         icons/ (pacote Lucide completo), sfx/ (sons base + kenney-interface/)
     references/         estilos de animação, lições aprendidas, setup dos conectores e chaves
-    scripts/            render_canvas.py, transcribe.py, stock.py, icons.py, sfx_track.py, contact_sheet.py,
-                        montagem.ffmpeg.sh, doctor.sh
+    scripts/            render_canvas.py, transcribe.py, stock.py, icons.py, sfx_track.py, capture_site.py,
+                        contact_sheet.py, montagem.ffmpeg.sh, doctor.sh
 ```
 
 ## Licença
