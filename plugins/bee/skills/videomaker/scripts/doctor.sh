@@ -22,24 +22,29 @@ if [[ "$MODE" == "--reset" ]]; then rm -f "$MARKER"; echo "Registo apagado: a pr
 if [[ "$MODE" == "--smoke" ]]; then
   T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT; FAIL=0
   step() { if "${@:2}" >"$T/log" 2>&1; then printf "  \033[32m✓\033[0m %s\n" "$1"; else printf "  \033[31m✗\033[0m %s\n" "$1"; sed 's/^/      /' "$T/log" | tail -6; FAIL=1; fi; }
-  mkdir -p "$T/scenes"
-  cat > "$T/scenes/01.html" <<'HTML'
+  (cd "$T" && bash "$SKILL_DIR/scripts/new_video.sh" 2026-01-smoke >/dev/null) || { echo "new_video.sh falhou"; exit 1; }
+  V="videos/2026-01-smoke"; S="$T/$V/production/scenes"
+  # cena com um logo em brand/, carregado pelo caminho ROOT dos modelos, para testar a estrutura de pastas
+  printf '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10" fill="#fff"/></svg>' > "$T/brand/logos/logo.svg"
+  cat > "$S/01.html" <<'HTML'
 <!doctype html><html><body style="margin:0"><canvas id="c"></canvas><script>
 const WIDTH = 270, HEIGHT = 480, FPS = 30, DURATION_S = 0.5;
+const ROOT = '../../../../';
 const c = document.getElementById('c'); c.width = WIDTH; c.height = HEIGHT; const ctx = c.getContext('2d');
-function renderFrame(t) { ctx.fillStyle = '#101828'; ctx.fillRect(0, 0, WIDTH, HEIGHT); ctx.fillStyle = '#ffb703'; ctx.beginPath(); ctx.arc(WIDTH / 2, HEIGHT / 2, 20 + 160 * t, 0, 7); ctx.fill(); }
+const logo = new Image(); logo.onload = () => { window.renderFrame = draw; }; logo.src = ROOT + 'brand/logos/logo.svg';
+function draw(t) { ctx.fillStyle = '#101828'; ctx.fillRect(0, 0, WIDTH, HEIGHT); ctx.fillStyle = '#ffb703'; ctx.beginPath(); ctx.arc(WIDTH / 2, HEIGHT / 2, 20 + 160 * t, 0, 7); ctx.fill(); ctx.drawImage(logo, 10, 10, 40, 40); }
 </script></body></html>
 HTML
   echo "Teste da cadeia (pasta temporária):"
-  render() { (cd "$T" && python3 "$SKILL_DIR/scripts/render_canvas.py" scenes/01.html scenes/01.mp4 && [[ "$(ffprobe -v error -count_frames -select_streams v:0 -show_entries stream=nb_read_frames -of csv=p=0 scenes/01.mp4)" == 15 ]]); }
-  icon() { (cd "$T" && python3 "$SKILL_DIR/scripts/icons.py" rocket && grep -q '"rocket"' sources/icons/lucide/icons.js); }
-  sfx() { (cd "$T" && printf '0.05 pop -18\n0.25 click_001 -16\n' > cues.tsv && python3 "$SKILL_DIR/scripts/sfx_track.py" cues.tsv sfx.wav --duration 0.5 && [[ -s sfx.wav ]]); }
-  mount() { (cd "$T" && SFX=sfx.wav bash "$SKILL_DIR/scripts/montagem.ffmpeg.sh" final.mp4 && [[ -s final.mp4 ]]); }
-  sheet() { (cd "$T" && python3 "$SKILL_DIR/scripts/contact_sheet.py" final.mp4 --frames 4 --width 120 --out folha.png && [[ -s folha.png ]]); }
+  render() { (cd "$T" && python3 "$SKILL_DIR/scripts/render_canvas.py" $V/production/scenes/01.html $V/production/scenes/01.mp4 && [[ "$(ffprobe -v error -count_frames -select_streams v:0 -show_entries stream=nb_read_frames -of csv=p=0 $V/production/scenes/01.mp4)" == 15 ]]); }
+  icon() { (cd "$T" && python3 "$SKILL_DIR/scripts/icons.py" rocket && grep -q '"rocket"' brand/icons/lucide/icons.js); }
+  sfx() { (cd "$T" && printf '0.05 pop -18\n0.25 click_001 -16\n' > $V/production/sfx.tsv && python3 "$SKILL_DIR/scripts/sfx_track.py" $V/production/sfx.tsv $V/production/audio/sfx.wav --duration 0.5 && [[ -s $V/production/audio/sfx.wav ]]); }
+  mount() { (cd "$T" && bash "$SKILL_DIR/scripts/montagem.ffmpeg.sh" $V && [[ -s $V/deliverables/2026-01-smoke-v1.mp4 ]]); }
+  sheet() { (cd "$T" && python3 "$SKILL_DIR/scripts/contact_sheet.py" $V/deliverables/2026-01-smoke-v1.mp4 --frames 4 --width 120 --out $V/production/build/folha.png && [[ -s $V/production/build/folha.png ]]); }
   step "Cena Canvas → MP4 (Chrome + Playwright + ffmpeg)" render
   step "Ícone Lucide do pacote local" icon
   step "Faixa de efeitos sonoros (numpy + biblioteca local)" sfx
-  step "Montagem final com efeitos" mount
+  step "Montagem final com efeitos (videos/<slug>/deliverables)" mount
   step "Folha de contacto (ffmpeg)" sheet
   [[ $FAIL -eq 0 ]] && echo "A cadeia funciona de ponta a ponta." || { echo "Há passos a falhar acima."; exit 1; }
   exit 0
@@ -86,20 +91,26 @@ else
 fi
 
 # 4. projeto: pastas, logos, fontes
-MISS_DIRS=""; for d in sources/logos sources/fonts scenes audio build; do [[ -d "$d" ]] || MISS_DIRS="$MISS_DIRS $d"; done
-[[ -z "$MISS_DIRS" ]] && add pastas projeto 1 ok "pastas do projeto" "sources/logos, sources/fonts, scenes, audio, build" "" || add pastas projeto 1 missing "pastas do projeto" "faltam:$MISS_DIRS" "mkdir -p$MISS_DIRS"
-NLOGOS=$(find sources/logos -type f \( -iname '*.svg' -o -iname '*.png' \) 2>/dev/null | wc -l | tr -d ' ')
-[[ "$NLOGOS" -gt 0 ]] && add logos projeto 1 ok "logos da marca" "$NLOGOS ficheiros em sources/logos/" "" || add logos projeto 1 missing "logos da marca" "os logos nunca são gerados por modelos: usam-se os ficheiros oficiais" "copiar os logos (SVG de preferência, PNG como alternativa) para sources/logos/"
+# layout antigo (tudo na raiz): a migração é feita pelo /bee:organize
+if [[ -n "$(find sources scenes -type f 2>/dev/null | head -1)" || ( -d audio && ! -d videos ) ]]; then   # pastas antigas vazias não contam
+  add layout projeto 1 missing "estrutura do projeto" "layout antigo (sources/, scenes/, audio/ na raiz): os scripts esperam brand/, library/ e videos/<slug>/" "/bee:organize (ou python3 $SKILL_DIR/scripts/migrate_layout.py para ver o plano)"
+else
+  add layout projeto 1 ok "estrutura do projeto" "brand/, library/, videos/<slug>/" ""
+fi
+MISS_DIRS=""; for d in brand/logos brand/fonts library/stock library/sfx library/music videos; do [[ -d "$d" ]] || MISS_DIRS="$MISS_DIRS $d"; done
+[[ -z "$MISS_DIRS" ]] && add pastas projeto 1 ok "pastas do projeto" "brand/, library/, videos/" "" || add pastas projeto 1 missing "pastas do projeto" "faltam:$MISS_DIRS" "mkdir -p$MISS_DIRS"
+NLOGOS=$(find brand/logos -type f \( -iname '*.svg' -o -iname '*.png' \) 2>/dev/null | wc -l | tr -d ' ')
+[[ "$NLOGOS" -gt 0 ]] && add logos projeto 1 ok "logos da marca" "$NLOGOS ficheiros em brand/logos/" "" || add logos projeto 1 missing "logos da marca" "os logos nunca são gerados por modelos: usam-se os ficheiros oficiais" "copiar os logos (SVG de preferência, PNG como alternativa) para brand/logos/"
 # as fontes esperadas leem-se do próprio modelo de cena (FONT_FACES), por isso este script serve qualquer marca
-WANT=$(grep -o "sources/fonts/[^'\"]*\.[ot]tf" "$SKILL_DIR/assets/canvas-scene.html" 2>/dev/null | sort -u)
+WANT=$(grep -o "brand/fonts/[^'\"]*\.[ot]tf" "$SKILL_DIR/assets/canvas-scene.html" 2>/dev/null | sort -u)
 MISS_FONTS=""; for f in $WANT; do [[ -f "$f" ]] || MISS_FONTS="$MISS_FONTS $(basename "$f")"; done
-NFONTS=$(find sources/fonts -type f \( -iname '*.ttf' -o -iname '*.otf' \) 2>/dev/null | wc -l | tr -d ' ')
-if [[ -z "$MISS_FONTS" && "$NFONTS" -gt 0 ]]; then add fontes projeto 1 ok "fontes da marca" "$NFONTS ficheiros em sources/fonts/" ""
-else add fontes projeto 1 missing "fontes da marca" "os modelos de cena carregam:$(for f in $WANT; do printf ' %s' "$(basename "$f")"; done); em falta:${MISS_FONTS:- (nenhuma fonte na pasta)}" "copiar as fontes .ttf da marca para sources/fonts/ com esses nomes, ou ajustar FONT_FACES nas cenas"; fi
+NFONTS=$(find brand/fonts -type f \( -iname '*.ttf' -o -iname '*.otf' \) 2>/dev/null | wc -l | tr -d ' ')
+if [[ -z "$MISS_FONTS" && "$NFONTS" -gt 0 ]]; then add fontes projeto 1 ok "fontes da marca" "$NFONTS ficheiros em brand/fonts/" ""
+else add fontes projeto 1 missing "fontes da marca" "os modelos de cena carregam:$(for f in $WANT; do printf ' %s' "$(basename "$f")"; done); em falta:${MISS_FONTS:- (nenhuma fonte na pasta)}" "copiar as fontes .ttf da marca para brand/fonts/ com esses nomes, ou ajustar FONT_FACES nas cenas"; fi
 
 # 5. opcionais do projeto
-if [[ -f sources/identidade-visual.md || -f identidade-visual.md ]]; then add identidade marca 0 ok "identidade-visual.md" "resumo do manual da marca" ""
-else add identidade marca 0 missing "identidade-visual.md" "opcional: cores oficiais, fontes e regras do logo; sem ele pergunta-se a paleta em cada briefing" "criar sources/identidade-visual.md com paleta (fundo, texto, acento), fonte de display e de corpo, e regras de uso do logo"; fi
+if [[ -f brand/brand-guide.md ]]; then add identidade marca 0 ok "brand/brand-guide.md" "resumo do manual da marca" ""
+else add identidade marca 0 missing "brand/brand-guide.md" "opcional: cores oficiais, fontes e regras do logo; sem ele pergunta-se a paleta em cada briefing" "criar brand/brand-guide.md com paleta (fundo, texto, acento), fonte de display e de corpo, e regras de uso do logo"; fi
 if [[ -f .env ]] && grep -q '^PIXABAY_API_KEY=.\+' .env; then add pixabay stock 0 ok "chave do Pixabay" "PIXABAY_API_KEY no .env" ""
 else add pixabay stock 0 missing "chave do Pixabay" "opcional: sem ela não há stock de vídeo (o Openverse continua a dar imagens e sons)" "criar conta em https://pixabay.com/api/docs/ e escrever PIXABAY_API_KEY=... no ficheiro .env da raiz do projeto"; fi
 

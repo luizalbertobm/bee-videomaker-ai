@@ -3,9 +3,9 @@
 depois do primeiro download do modelo. Produz .txt, .srt, .vtt e .json com timestamps por palavra.
 
 Uso (a partir da raiz do projeto):
-  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/transcribe.py sources/narracao.mp3
-  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/transcribe.py audio/*.mp3 --language pt --out-dir legendas
-  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/transcribe.py audio/02.mp3 --max-chars 24   # legendas curtas p/ reels
+  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/transcribe.py videos/<slug>/production/inputs/narracao.mp3
+  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/transcribe.py videos/<slug>/production/audio/*.mp3 --language pt --out-dir videos/<slug>/production/build/subtitles
+  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/transcribe.py videos/<slug>/production/audio/02.mp3 --max-chars 24   # legendas curtas p/ reels
 
 Modelos (download automático para ~/.cache/huggingface na primeira vez):
   large-v3   melhor qualidade, multilingue, ~3 GB      (por omissão)

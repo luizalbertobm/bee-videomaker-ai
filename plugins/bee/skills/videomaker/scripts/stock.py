@@ -6,7 +6,7 @@ Uso (a partir da raiz do projeto):
   python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/stock.py "honeycomb macro" --type video --orientation portrait
   python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/stock.py "office team" --type image --source pixabay --limit 10
   python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/stock.py "whoosh" --type audio                      # só Openverse/Freesound
-  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/stock.py "city night" --type video --download 1,3 --out-dir stock
+  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/stock.py "city night" --type video --download 1,3
   python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/stock.py "bee" --type image --json                 # saída JSON p/ automação
 
 Chave (gratuita) por variável de ambiente ou ficheiro .env na raiz do projeto:
@@ -18,7 +18,7 @@ Limites do Pixabay sem acesso total à API: imagens descarregadas com no máximo
 (a tabela mostra o tamanho real do ficheiro, não o do original); vídeos sem filtro de orientação na API,
 por isso o script pede mais resultados e filtra vertical/horizontal/quadrado do lado de cá.
 
-Cada download acrescenta uma linha a creditos.md (fonte, autor, licença, link). O Pixabay pede que se
+Cada download vai para library/stock/ e acrescenta uma linha a library/credits.md (fonte, autor, licença, link). O Pixabay pede que se
 mostre a origem; Openverse devolve a atribuição exata exigida pela licença CC — copiar para a descrição do vídeo.
 """
 import argparse, hashlib, json, os, pathlib, sys, time, urllib.parse, urllib.request
@@ -167,8 +167,8 @@ def main():
     ap.add_argument('--min-width', type=int, default=0)
     ap.add_argument('--min-height', type=int, default=0)
     ap.add_argument('--download', default=None, help='números dos resultados a descarregar, ex. 1,3 ou all')
-    ap.add_argument('--out-dir', default='stock')
-    ap.add_argument('--credits', default='creditos.md')
+    ap.add_argument('--out-dir', default='library/stock')
+    ap.add_argument('--credits', default='library/credits.md')
     ap.add_argument('--json', action='store_true', help='imprimir resultados em JSON (sem tabela)')
     a = ap.parse_args()
     load_env()

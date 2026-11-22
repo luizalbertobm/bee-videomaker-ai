@@ -3,15 +3,15 @@
 Só ffmpeg/ffprobe e a biblioteca padrão (sem Pillow).
 
 Uso (a partir da raiz do projeto):
-  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/contact_sheet.py scenes/03.mp4                 # 8 frames, 4 colunas
-  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/contact_sheet.py scenes/03.mp4 --frames 12 --cols 6
-  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/contact_sheet.py scenes/03.mp4 --times 0,0.4,1.25,2.9  # instantes exatos
-  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/contact_sheet.py scenes/0*.mp4 --frames 5         # uma linha por cena
-  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/contact_sheet.py stock/thumbs/*.jpg --cols 6      # imagens soltas, uma por célula
+  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/contact_sheet.py videos/<slug>/production/scenes/03.mp4   # 8 frames, 4 colunas
+  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/contact_sheet.py videos/<slug>/production/scenes/03.mp4 --frames 12 --cols 6
+  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/contact_sheet.py videos/<slug>/production/scenes/03.mp4 --times 0,0.4,1.25,2.9  # instantes exatos
+  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/contact_sheet.py videos/<slug>/production/scenes/0*.mp4 --frames 5         # uma linha por cena
+  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/contact_sheet.py library/stock/*.jpg --cols 6      # imagens soltas, uma por célula
   python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/contact_sheet.py final.mp4 --frames 12 --safe       # linhas da zona segura de reel
 
 Os frames de cada vídeo vão do primeiro ao último, igualmente espaçados; cada célula leva o nome do ficheiro e o
-instante em segundos, para cruzar com o código da cena (renderFrame(t)). Saída por omissão: <primeiro>_folha.png
+instante em segundos, para cruzar com o código da cena (renderFrame(t)). Saída por omissão: <primeiro>_folha.png (em production/build/ quando a entrada está num vídeo do projeto)
 (ou --out). Ler a imagem resultante em vez de abrir o vídeo: apanha textos fora das caixas, elementos cortados,
 frames vazios e saltos entre cenas. --safe desenha a zona segura de reel 9:16 (linhas a y=120 e y=1500 numa
 altura de 1920, proporcionais noutras): o que importa tem de ficar entre as duas.
@@ -63,6 +63,15 @@ def grab(src, t, dest, w, h, label, use_label, safe=False):
     return r.returncode == 0 and dest.exists(), r.stderr.strip()
 
 
+def default_out(src):
+    """<nome>_folha.png; dentro de videos/<slug>/production/ vai para production/build/, para não se misturar com as cenas."""
+    for parent in src.resolve().parents:
+        if parent.name == 'production':
+            d = parent / 'build'; d.mkdir(parents=True, exist_ok=True)
+            return d / (src.stem + '_folha.png')
+    return src.with_name(src.stem + '_folha.png')
+
+
 def main():
     ap = argparse.ArgumentParser(description='Folha de contacto de vídeos ou imagens (só ffmpeg).')
     ap.add_argument('inputs', nargs='+', help='vídeos (mp4, webm…) e/ou imagens')
@@ -106,7 +115,7 @@ def main():
 
     cols = a.cols or (per_row if len(videos) > 1 and len(videos) == len(srcs) else min(4, len(cells)))
     rows = -(-len(cells) // cols)
-    out = pathlib.Path(a.out) if a.out else srcs[0].with_name(srcs[0].stem + '_folha.png')
+    out = pathlib.Path(a.out) if a.out else default_out(srcs[0])
 
     with tempfile.TemporaryDirectory() as tmp:
         tmp = pathlib.Path(tmp); use_label = not a.no_labels; warned = False

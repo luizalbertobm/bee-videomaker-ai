@@ -1,6 +1,6 @@
 # Estilos de animação Canvas
 
-Três estilos que o Claude executa com qualidade em Canvas 2D, determinísticos (tudo deriva de `t`) e renderizáveis com `scripts/render_canvas.py`. Cada um tem uma cena-demonstração em `assets/estilo-*.html` (4 s, 1080x1920) que serve de **template de partida**: copiar para `scenes/NN.html` e adaptar texto, tempos e cores.
+Três estilos que o Claude executa com qualidade em Canvas 2D, determinísticos (tudo deriva de `t`) e renderizáveis com `scripts/render_canvas.py`. Cada um tem uma cena-demonstração em `assets/estilo-*.html` (4 s, 1080x1920) que serve de **template de partida**: copiar para `videos/<slug>/production/scenes/NN.html` e adaptar texto, tempos e cores.
 
 Apresentar os três ao utilizador na etapa 1 e pedir a escolha antes do roteiro. Não misturar estilos no mesmo vídeo, exceto o logo intro/outro, que pode ser neutro.
 
@@ -49,4 +49,4 @@ Fundo quase preto, grelha em perspetiva, partículas, linhas de luz e contadores
 
 - Guardar `WIDTH`, `HEIGHT`, `FPS`, `DURATION_S` e uma `renderFrame(t)` pura, como nas demos.
 - Helpers de easing: `seg(t, t0, d)`, `easeOut`, `easeInOut`, `easeIn`, `backOut`. Copiar das demos.
-- Rever sempre uma folha de contacto de 8 frames antes de aceitar a cena: `python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/contact_sheet.py scenes/NN.mp4`.
+- Rever sempre uma folha de contacto de 8 frames antes de aceitar a cena: `python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/contact_sheet.py videos/<slug>/production/scenes/NN.mp4` (a folha vai para `production/build/`).

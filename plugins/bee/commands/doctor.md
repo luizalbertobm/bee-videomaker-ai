@@ -47,13 +47,13 @@ Regras para todos os passos:
 O render desenha as cenas no Chrome. Se faltar, mostra o `fix`. Alternativa sem Chrome: `python3 -m playwright install chromium` e trocar `channel="chrome"` por Chromium em `render_canvas.py`; só a proponhas se o utilizador não puder instalar o Chrome.
 
 ### Passo 4 — Pastas do projeto (`id: pastas`)
-Cria as pastas em falta com o `mkdir -p` do `fix` (podes correr depois do sim). Explica numa linha: `sources/` guarda o que é da marca, `scenes/` e `audio/` o trabalho de cada vídeo, `build/` os intermediários.
+Se o item `layout` estiver em falta, o projeto usa o layout antigo (tudo na raiz): propõe o `/bee:organize`, que migra com pré-visualização, e só depois continua. Cria as pastas em falta com o `mkdir -p` do `fix` (podes correr depois do sim). Explica em duas linhas: `brand/` guarda o que é da marca e `library/` o material reutilizável (stock, efeitos, música, créditos), ambos partilhados; cada vídeo tem a sua pasta `videos/<slug>/`, criada no início de cada produção, com `production/` (trabalho) separado de `deliverables/` (o que se entrega).
 
 ### Passo 5 — Logos e fontes (`id: logos`, `id: fontes`)
-Estes ficheiros são do utilizador e nunca se geram. Pergunta onde estão (um caminho no computador) e copia-os para `sources/logos/` e `sources/fonts/`. Nos logos, prefere SVG. Nas fontes, o `detail` diz que nomes de ficheiro os modelos de cena esperam: copia com esses nomes ou, se a marca usa outras fontes, diz que as cenas ajustam `FONT_FACES`. Se a marca não tiver fonte própria, sugere uma livre do Google Fonts (licença OFL) e deixa o utilizador escolher e descarregar.
+Estes ficheiros são do utilizador e nunca se geram. Pergunta onde estão (um caminho no computador) e copia-os para `brand/logos/` e `brand/fonts/`. Nos logos, prefere SVG. Nas fontes, o `detail` diz que nomes de ficheiro os modelos de cena esperam: copia com esses nomes ou, se a marca usa outras fontes, diz que as cenas ajustam `FONT_FACES`. Se a marca não tiver fonte própria, sugere uma livre do Google Fonts (licença OFL) e deixa o utilizador escolher e descarregar.
 
 ### Passo 6 — Identidade visual (`id: identidade`, opcional)
-Se faltar, oferece criar `sources/identidade-visual.md` a partir de três perguntas: cores (fundo, texto, acento, em hexadecimal), fonte de títulos e de corpo, e regras do logo (versões, o que evitar). Se o utilizador tiver um manual de marca em PDF, oferece resumi-lo. Pode saltar: sem o ficheiro, a paleta pergunta-se em cada briefing.
+Se faltar, oferece criar `brand/brand-guide.md` a partir de três perguntas: cores (fundo, texto, acento, em hexadecimal), fonte de títulos e de corpo, e regras do logo (versões, o que evitar). Se o utilizador tiver um manual de marca em PDF, oferece resumi-lo. Pode saltar: sem o ficheiro, a paleta pergunta-se em cada briefing.
 
 ### Passo 7 — Stock gratuito (`id: pixabay`, opcional)
 Sem a chave do Pixabay não há stock de vídeo. Se faltar e o utilizador a quiser:

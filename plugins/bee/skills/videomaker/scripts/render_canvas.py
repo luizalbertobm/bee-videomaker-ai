@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Renderiza uma cena Canvas (HTML com renderFrame(t), WIDTH, HEIGHT, FPS, DURATION_S)
 frame a frame com Chromium headless e produz um MP4 via ffmpeg.
-Uso (a partir da raiz do projeto): python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/render_canvas.py scenes/01.html scenes/01.mp4 [dir_frames]
-Requer: playwright (Python), Google Chrome, ffmpeg. A cena pode carregar imagens de sources/ por caminho
-relativo (ex. ../sources/logos/x.png): o Chrome é lançado com --allow-file-access-from-files para o canvas
+Uso (a partir da raiz do projeto): python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/render_canvas.py videos/<slug>/production/scenes/01.html videos/<slug>/production/scenes/01.mp4 [dir_frames]
+Requer: playwright (Python), Google Chrome, ffmpeg. A cena pode carregar imagens de brand/ e de production/inputs/ por caminho
+relativo (ex. ROOT + 'brand/logos/x.svg', com ROOT = '../../../../'): o Chrome é lançado com --allow-file-access-from-files para o canvas
 não ficar "tainted" e o toDataURL continuar a funcionar.
 Com --background video.mp4 a cena é composta por cima de um vídeo (stock) recortado a 9:16 e escurecido
 (--dim); a cena deve deixar o canvas transparente (não pintar o fundo) onde o vídeo deve aparecer.
@@ -13,7 +13,7 @@ from playwright.sync_api import sync_playwright
 
 ap = argparse.ArgumentParser()
 ap.add_argument('scene'); ap.add_argument('out'); ap.add_argument('frames_dir', nargs='?')
-ap.add_argument('--background', help='vídeo de fundo (ex. stock/pixabay-123.mp4): a cena é composta por cima; deixar o canvas transparente onde o vídeo deve aparecer')
+ap.add_argument('--background', help='vídeo de fundo (ex. library/stock/pixabay-123.mp4): a cena é composta por cima; deixar o canvas transparente onde o vídeo deve aparecer')
 ap.add_argument('--dim', type=float, default=0.55, help='fator de luminosidade do vídeo de fundo (0..1), para o texto ler bem')
 ap.add_argument('--bg-offset', type=float, default=0.0, help='segundos a saltar no início do vídeo de fundo')
 ap.add_argument('--crf', type=int, default=18, help='qualidade x264 da cena (menor = melhor); 18 por omissão porque a montagem volta a codificar')

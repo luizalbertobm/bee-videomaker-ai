@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Ícones Lucide (ISC, traço 2 px em base 24; conjunto consistente e compacto) para as animações Canvas.
 O pacote completo (2.356 SVGs + tags) vem com a skill em assets/icons/lucide/, por isso tudo funciona offline:
-este script copia os ícones pedidos para sources/icons/lucide/ (com a cor pedida, para <img>) e gera
-sources/icons/lucide/icons.js, onde cada ícone é uma lista de caminhos (Path2D) no viewBox 24x24,
+este script copia os ícones pedidos para brand/icons/lucide/ (com a cor pedida, para <img>) e gera
+brand/icons/lucide/icons.js, onde cada ícone é uma lista de caminhos (Path2D) no viewBox 24x24,
 para o Canvas desenhar com traço que se escreve (setLineDash), em qualquer cor e tamanho.
 
 Uso (a partir da raiz do projeto):
@@ -22,7 +22,7 @@ VERSION = '1.72.0'
 CDN = f'https://unpkg.com/lucide-static@{VERSION}'
 PACK = pathlib.Path(__file__).resolve().parent.parent / 'assets' / 'icons' / 'lucide'   # pacote completo na skill
 PACK_JS = PACK.parent / 'lucide.js'                                                     # todos os ícones já convertidos
-OUT = pathlib.Path('sources/icons/lucide')
+OUT = pathlib.Path('brand/icons/lucide')   # partilhado por todos os vídeos do projeto
 UA = 'videomaker-skill/1.0'
 
 
@@ -92,7 +92,7 @@ def convert_dir(folder):
 
 
 def write_js():
-    """icons.js do projeto a partir dos SVGs escolhidos em sources/icons/lucide/."""
+    """icons.js do projeto a partir dos SVGs escolhidos em brand/icons/lucide/."""
     icons = convert_dir(OUT)
     js = OUT / 'icons.js'
     js.write_text(header(len(icons)) + 'window.LUCIDE = ' + json.dumps(icons, separators=(',', ':')) + ';\n')

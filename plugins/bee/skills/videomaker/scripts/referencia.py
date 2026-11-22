@@ -6,9 +6,9 @@ Uso (a partir da raiz do projeto):
   python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/referencia.py URL --section 0-30          # só os primeiros 30 s
   python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/referencia.py URL --cookies-from-browser chrome   # sites que pedem sessão
   python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/referencia.py URL --meta-only              # só metadados, sem descarregar
-  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/referencia.py build/final.mp4 --out-dir build/revisao   # o nosso vídeo, para comparar
+  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/referencia.py videos/<slug>/deliverables/<slug>-v1.mp4 --out-dir videos/<slug>/production/build/review/ritmo   # o nosso vídeo
 
-Para cada entrada cria referencias/<origem-id>/ (ou --out-dir) com:
+Para cada entrada cria references/<origem-id>/ (ou --out-dir) com:
   video.mp4          cópia em baixa resolução (720p por omissão), só para estudo
   info.json          metadados úteis (título, canal, duração, visualizações, hashtags, capítulos)
   cortes.csv         instante de cada corte e duração de cada plano
@@ -18,7 +18,7 @@ Para cada entrada cria referencias/<origem-id>/ (ou --out-dir) com:
 
 O download usa o yt-dlp (pip install yt-dlp; manter atualizado, os sites mudam). Os cookies do browser só são lidos
 com --cookies-from-browser e nunca são guardados. Material de terceiros fica nesta pasta e serve só para estudo:
-a montagem lê apenas scenes/ e audio/, e nada de referencias/ deve entrar no vídeo final.
+a montagem lê apenas videos/<slug>/production/, e nada de references/ deve entrar no vídeo final.
 """
 import argparse, csv, json, pathlib, re, shutil, statistics, subprocess, sys
 
@@ -124,7 +124,7 @@ def transcribe(v, out, a):
 def main():
     ap = argparse.ArgumentParser(description='Ficha de ritmo de um vídeo de referência (link ou ficheiro).')
     ap.add_argument('entrada', help='URL (qualquer site suportado pelo yt-dlp) ou caminho de um vídeo local')
-    ap.add_argument('--out-dir', default=None, help='pasta de saída (por omissão referencias/<origem-id>)')
+    ap.add_argument('--out-dir', default=None, help='pasta de saída (por omissão references/<origem-id>)')
     ap.add_argument('--max-height', type=int, default=720, help='altura máxima a descarregar (720)')
     ap.add_argument('--section', help='só um trecho, em segundos ou mm:ss: "0-30", "1:10-1:40"')
     ap.add_argument('--cookies-from-browser', help='chrome | firefox | edge... para sites que pedem sessão (a do próprio utilizador)')
@@ -146,7 +146,7 @@ def main():
         if not a.entrada.strip() or not src.is_file():
             sys.exit(f'[erro] ficheiro não encontrado: {a.entrada!r}')
         name = slug(src.stem)
-    out = pathlib.Path(a.out_dir) if a.out_dir else pathlib.Path('referencias') / name
+    out = pathlib.Path(a.out_dir) if a.out_dir else pathlib.Path('references') / name
     out.mkdir(parents=True, exist_ok=True)
 
     info = {}
@@ -219,7 +219,7 @@ def main():
 
     m = ficha['metadados']
     L = [f"# Ficha de referência — {m.get('title') or video.name}", '',
-         '> Material de terceiros, só para estudo. Não entra no vídeo final (a montagem lê apenas scenes/ e audio/).' if is_url else '> Vídeo local analisado.', '',
+         '> Material de terceiros, só para estudo. Não entra no vídeo final (a montagem lê apenas videos/<slug>/production/).' if is_url else '> Vídeo local analisado.', '',
          f"- Origem: {m.get('webpage_url') or a.entrada}" + (f" · {m['uploader']}" if m.get('uploader') else ''),
          f"- Duração {ficha['duracao_s']} s · {ficha['resolucao']} · {ficha['fps']} fps" +
          (f" · {m['view_count']:,} visualizações".replace(',', '.') if m.get('view_count') else ''), '',

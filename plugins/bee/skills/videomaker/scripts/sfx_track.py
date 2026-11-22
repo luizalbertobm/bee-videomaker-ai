@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Monta uma faixa de efeitos sonoros (WAV) a partir de uma folha de deixas, para a montagem misturar com SFX=.
-Uso (raiz do projeto): python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/sfx_track.py deixas.tsv sfx.wav --duration 25 [--dir stock/sfx]
+Uso (raiz do projeto): python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/sfx_track.py videos/<slug>/production/sfx.tsv videos/<slug>/production/audio/sfx.wav --duration 25 [--dir library/sfx]
 
 Folha de deixas: uma linha por som, colunas separadas por espaços; "#" inicia comentário.
     tempo_s  som  pico_dB  [pitch]  [inicio_s]  [duracao_s]
@@ -22,7 +22,7 @@ SR = 44100
 ap = argparse.ArgumentParser()
 ap.add_argument('cues', nargs='?'); ap.add_argument('out', nargs='?')
 ap.add_argument('--duration', type=float, help='duração da faixa (s), igual à do vídeo')
-ap.add_argument('--dir', default='stock/sfx', help='pasta de sons do projeto, vista antes da biblioteca da skill')
+ap.add_argument('--dir', default='library/sfx', help='pasta de sons do projeto, vista antes da biblioteca da skill')
 ap.add_argument('--list', action='store_true', help='listar os sons disponíveis e sair')
 a = ap.parse_args()
 LIB = pathlib.Path(__file__).resolve().parent.parent / 'assets' / 'sfx'    # biblioteca local da skill

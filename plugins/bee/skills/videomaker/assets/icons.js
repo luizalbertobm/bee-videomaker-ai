@@ -1,6 +1,6 @@
-// icons.js — desenha ícones Lucide no Canvas a partir de sources/icons/lucide/icons.js (gerado por scripts/icons.py).
-// Incluir nas cenas: <script src="../sources/icons/lucide/icons.js"></script> e depois este ficheiro
-// (copiado para scenes/ ou referenciado por caminho). Tudo determinístico; o traço "escreve-se" com setLineDash.
+// icons.js — desenha ícones Lucide no Canvas a partir de brand/icons/lucide/icons.js (gerado por scripts/icons.py).
+// Incluir nas cenas: <script src="../../../../brand/icons/lucide/icons.js"></script> e depois este ficheiro
+// (o new_video.sh copia-o para videos/<slug>/production/scenes/, ou referenciado por caminho). Tudo determinístico; o traço "escreve-se" com setLineDash.
 window.Icons = (() => {
   const cache = {};
   const paths = name => {
