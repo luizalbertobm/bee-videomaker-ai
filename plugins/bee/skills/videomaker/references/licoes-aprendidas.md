@@ -11,7 +11,7 @@ Ler antes de estimar custos, gerar áudio/vídeo ou montar. Acrescentar uma linh
 - Fala eleven_v4: 26–50 créditos por frase curta (5 frases, ~15 s de voz: ~200 créditos). `estimate_only` devolve o custo exato.
 - Música eleven_music_v2_5: ~900 créditos por faixa de 22 s (estimativa dizia 1500), 1–2 min a gerar.
 - Vídeo 5 s (flow ElevenLabs): Seedance 2.5 ≈ 14.000; Seedance v2 mini ≈ 4.600; LTX v2 fast ≈ 1.450. Higgsfield Seedance 2.5 5 s = 35 créditos. Mini/fast para testes, modelo grande só para a entrega.
-- Os links de download expiram em ~2,5 h: descarregar logo para `audio/` e `scenes/`.
+- Os links de download expiram em ~2,5 h: descarregar logo para `production/audio/` e `production/scenes/` do vídeo.
 
 ## Canvas e render
 - `render_canvas.py` substitui `requestAnimationFrame` por uma função vazia e chama `renderFrame(t)` por frame: tudo deve derivar de `t`; nada de estado acumulado ou `performance.now()`.
@@ -28,23 +28,23 @@ Ler antes de estimar custos, gerar áudio/vídeo ou montar. Acrescentar uma linh
 - SVGs exportados sem IDs ainda têm cada peça num grupo de topo: dá para os dividir em camadas com o mesmo viewBox e animar cada uma (escala, rotação com pivô, alpha) sem redesenhar a marca. Classificar letras por serem `<g fill=…>` sem clip-path, não pela cor.
 
 ## Montagem
-- Canvas renderiza para `scenes/NN.mp4`; `build/` é só intermediário. A montagem lê `scenes/NN.*` e `audio/NN.mp3`.
+- Canvas renderiza para `production/scenes/NN.mp4`; `production/build/` é só intermediário. A montagem lê `production/scenes/NN.*` e `production/audio/NN.mp3` e escreve só em `deliverables/`.
 - `concat -c copy` falha a misturar cenas com e sem áudio: o script dá silêncio às cenas mudas e normaliza para AAC.
 - Narração mais curta que a cena cortava o vídeo por `-shortest`; agora `-af apad`.
-- Música de fundo: `musica.mp3` na raiz, volume `MUSIC_VOL`, ducking por `sidechaincompress`, mistura em estéreo.
+- Música de fundo: `production/music.mp3` do vídeo (ou `MUSIC=library/music/x.mp3`), volume `MUSIC_VOL`, ducking por `sidechaincompress`, mistura em estéreo.
 - `LC_ALL=C` no script: com locale em vírgula decimal, `awk` escreve "18,38" e o ffmpeg lê dois filtros.
 - Volume final normalizado a `LUFS=-14` (alvo de Instagram/TikTok/YouTube) e pico verdadeiro ≤ `TP=-1.5` dBTP, em duas passagens de `loudnorm` (a 1.ª mede, a 2.ª aplica um ganho linear com os valores medidos, sem compressão dinâmica); `LUFS=0` desliga. O `loudnorm` alonga o áudio ~0,1 s, o que com `-shortest` e `-c:v copy` cortava 3 s do fim do vídeo: a faixa tem de se cortar com `atrim` pela duração do vídeo, não pelo `-shortest`.
 
 ## Stock e ícones
 - O Pixabay é a única fonte de vídeo gratuito com API utilizável: o Pexels suspendeu a emissão de chaves novas e foi retirado da skill. A API de vídeo do Pixabay ignora `orientation` (o script filtra localmente) e as imagens chegam com no máximo 1280 px no lado maior. Openverse (imagens CC e sons do Freesound) não precisa de chave mas devolve 502/504 de vez em quando; fotos do Flickr vêm com 1024 px no máximo.
-- Licenças CC BY-SA obrigam a publicar o vídeo com a mesma licença; preferir CC0 ou CC BY. Entregar sempre `creditos.md`.
+- Licenças CC BY-SA obrigam a publicar o vídeo com a mesma licença; preferir CC0 ou CC BY. Entregar sempre `deliverables/credits.md` (as linhas de `library/credits.md` usadas no vídeo).
 - Ícones: Lucide (ISC) via `icons.py`; `qr-code` serve para Pix. Em ícones pequenos ao lado de texto bold, `lineWidth` 2,2–3.
 
 ## Transcrição local
 - faster-whisper `large-v3` na GPU transcreve 7 s em ~1,4 s; `small` em CPU em ~3 s. As libs CUDA instaladas por pip não estão no `LD_LIBRARY_PATH`; o script pré-carrega-as com `ctypes` e cai para CPU se a primeira computação falhar.
 
 ## Organização
-- `scenes/`, `audio/` e `build/` são partilhadas: um segundo vídeo no mesmo repositório sobrescreve o anterior. Usar subpastas por projeto ou arquivar antes de começar.
+- Cada vídeo vive em `videos/<slug>/` (criado por `new_video.sh`): um segundo vídeo nunca sobrescreve o primeiro, e a montagem numera as entregas (`<slug>-v1.mp4`, `-v2`…) em vez de as substituir. Só `brand/` e `library/` são partilhadas.
 
 ## Reel com vídeo real
 - Escolher stock a olhar, não pelo título: pedir ~24 resultados por termo, descarregar só as miniaturas, montar uma folha de contacto com `contact_sheet.py` e só então descarregar os eleitos.
@@ -54,7 +54,7 @@ Ler antes de estimar custos, gerar áudio/vídeo ou montar. Acrescentar uma linh
 - Bandeiras, matrículas e letreiros denunciam o país da filmagem: escolher janelas de tempo sem eles ou tapá-los com um cartão de UI.
 - Qualidade: `--crf 18` no render e `CRF=18` na montagem; com 23 as duas codificações seguidas notam-se em folhagem e multidões.
 - Música mais curta que o vídeo: `atempo` (ex. 0,88) estica sem mudar o tom e mantém o final limpo.
-- Versões lado a lado: `SCENES=scenes/v2 AUDIO=audio/v2` na montagem; `adelay` numa cópia da narração dá respiro antes da voz sem mexer no original.
+- Versões lado a lado: `SCENES=videos/<slug>/production/scenes/en AUDIO=videos/<slug>/production/audio/en` e um nome (`montagem.ffmpeg.sh videos/<slug> v2-en`); variantes são subpastas do mesmo vídeo, não pastas novas na raiz; `adelay` numa cópia da narração dá respiro antes da voz sem mexer no original.
 
 ## Efeitos sonoros
 - Folha de deixas + `sfx_track.py`: cada som é normalizado ao pico pedido, o silêncio inicial é cortado (o ataque cai no tempo da deixa) e tudo é somado numa faixa WAV com a duração do vídeo; `SFX=` na montagem mistura-a por cima da voz e da música.

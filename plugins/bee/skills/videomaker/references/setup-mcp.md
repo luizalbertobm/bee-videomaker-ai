@@ -19,7 +19,7 @@ Depois, dentro de uma sessão interativa do Claude Code, correr `/mcp` e conclui
 
 - `--scope user` disponibiliza os servidores em todos os projetos; omitir para registar só neste projeto.
 - O nome dado no `claude mcp add` (`higgsfield`, `elevenlabs`) vira o prefixo das tools: `mcp__higgsfield__generate_video`, `mcp__elevenlabs__creative_generate_speech`. Em conectores ligados pela app Claude o prefixo pode ser um identificador gerado; procurar pelo sufixo da tool.
-- Sem os conectores a skill continua a funcionar para roteiro, cenas Canvas (`${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/render_canvas.py`) e montagem (`${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/montagem.ffmpeg.sh`), e pode usar narração já existente em `sources/`.
+- Sem os conectores a skill continua a funcionar para roteiro, cenas Canvas (`${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/render_canvas.py`) e montagem (`${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/montagem.ffmpeg.sh`), e pode usar narração já existente em `production/inputs/` do vídeo.
 
 ## Dependências locais
 

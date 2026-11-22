@@ -10,10 +10,10 @@
 <script src="devices.js"></script>
 <script>
 // Demo de assets/devices.js: portátil e telemóvel em perspetiva, com uma página a fazer scroll no ecrã.
-// Copiar para scenes/ junto com devices.js e trocar PAGES pelas capturas de scripts/capture_site.py.
+// Copiar para videos/<slug>/production/scenes/ (o new_video.sh já lá põe o devices.js) e trocar PAGES pelas capturas de scripts/capture_site.py.
 const WIDTH = 1080, HEIGHT = 1920, FPS = 30, DURATION_S = 7;
 const FONT = 'system-ui, "DejaVu Sans", Arial, sans-serif';
-// Capturas reais: { desktop: '../sources/site-desktop.png', mobile: '../sources/site-mobile.png' }. Vazio = página de exemplo.
+// Capturas reais (production/inputs/): { desktop: '../inputs/site-desktop.png', mobile: '../inputs/site-mobile.png' }. Vazio = página de exemplo.
 const PAGES = {};
 const ACCENT = '#5b5bd6';
 const canvas = document.getElementById('c'); canvas.width = WIDTH; canvas.height = HEIGHT;

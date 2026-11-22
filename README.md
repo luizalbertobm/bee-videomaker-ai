@@ -12,7 +12,7 @@ Plugin para Claude Code que produz reels e vídeos curtos de ponta a ponta, gast
 - **Análise de vídeos de referência** (`referencia.py`): a partir de um link (via [yt-dlp](https://github.com/yt-dlp/yt-dlp)) ou ficheiro, gera uma ficha de ritmo — planos, cortes por 10 s, palavras por segundo, gancho dos primeiros 3 s, loudness, folha de frames — para o roteiro seguir um ritmo que já funciona. Só para estudo: nada da referência entra no vídeo.
 - **Revisor de qualidade** (agente `revisor-video`, só leitura): antes da entrega, mede formato, frames vazios, zona segura, áudio e a voz contra o roteiro, e devolve um veredicto com a prova de cada problema — sem alterar ficheiros nem gastar créditos.
 
-Invoca-se com `/bee:videomaker` (ou basta pedir um vídeo); `/bee:doctor` verifica as dependências e, na primeira execução num projeto, guia a preparação passo a passo.
+Invoca-se com `/bee:videomaker` (ou basta pedir um vídeo); `/bee:doctor` verifica as dependências e, na primeira execução num projeto, guia a preparação passo a passo; `/bee:organize` migra projetos do layout antigo.
 
 ## Instalar
 
@@ -25,18 +25,29 @@ Depois, no projeto: `/bee:doctor`. Na primeira vez é um assistente guiado: ferr
 
 ## O que o projeto precisa
 
-- `sources/logos/` com os logos da marca (SVG de preferência) e `sources/fonts/` com as fontes `.ttf` (`display.ttf`, `body.ttf`, ou ajustar `FONT_FACES` nos modelos).
-- Opcional: `sources/identidade-visual.md` com o resumo do manual da marca; `.env` com `PIXABAY_API_KEY` para stock de vídeo.
+- `brand/logos/` com os logos da marca (SVG de preferência) e `brand/fonts/` com as fontes `.ttf` (`display.ttf`, `body.ttf`, ou ajustar `FONT_FACES` nos modelos).
+- Opcional: `brand/brand-guide.md` com o resumo do manual da marca; `.env` com `PIXABAY_API_KEY` para stock de vídeo.
 - Conector ElevenLabs ligado ao Claude (tools `creative_*`); Higgsfield opcional para imagens e vídeo gerados.
 - Localmente: ffmpeg, bc, Python 3 com `playwright`, `numpy` e `faster-whisper`, Google Chrome. Opcional: `yt-dlp` para analisar vídeos de referência por link.
 
-## Estrutura
+## Pastas de um projeto
+
+```
+brand/                 logos, fontes, ícones e brand-guide.md (partilhado)
+library/               stock, efeitos, música e credits.md (partilhado)
+references/<id>/       análises de vídeos de referência, só para estudo
+videos/<AAAA-MM-slug>/ um por vídeo: script.md, production/ (inputs, scenes, audio, build) e deliverables/ (MP4 numerados + credits.md)
+```
+
+Cada vídeo começa com `new_video.sh <nome>`; a montagem escreve `deliverables/<slug>-v1.mp4`, `-v2`… sem sobrescrever. Projetos criados com versões anteriores (tudo na raiz: `sources/`, `scenes/`, `audio/`) migram-se com `/bee:organize`, que mostra o plano antes de mover.
+
+## Estrutura do repositório
 
 ```
 .claude-plugin/marketplace.json
 plugins/bee/
   .claude-plugin/plugin.json, icon.png
-  commands/doctor.md
+  commands/doctor.md, organize.md
   agents/revisor-video.md     revisor de qualidade só de leitura, chamado na etapa 6
   skills/videomaker/
     SKILL.md            fluxo em 6 etapas, regras, onde está cada coisa
@@ -44,10 +55,10 @@ plugins/bee/
                         devices.js + mockup-demo.html (mockups de portátil/telemóvel),
                         icons/ (pacote Lucide completo), sfx/ (sons base + kenney-interface/)
     references/         estilos de animação, lições aprendidas, setup dos conectores e chaves
-    scripts/            render_canvas.py, transcribe.py, stock.py, icons.py, sfx_track.py, capture_site.py,
+    scripts/            new_video.sh, migrate_layout.py, render_canvas.py, transcribe.py, stock.py, icons.py, sfx_track.py, capture_site.py,
                         referencia.py, contact_sheet.py, montagem.ffmpeg.sh, doctor.sh
 ```
 
 ## Licença
 
-MIT. Os ícones Lucide são ISC; os efeitos sonoros são CC0 (créditos em `plugins/bee/skills/videomaker/assets/sfx/CREDITOS.md`); os bancos de stock têm as licenças indicadas em `creditos.md` por asset.
+MIT. Os ícones Lucide são ISC; os efeitos sonoros são CC0 (créditos em `plugins/bee/skills/videomaker/assets/sfx/CREDITOS.md`); os bancos de stock têm as licenças indicadas em `library/credits.md` de cada projeto, por asset.

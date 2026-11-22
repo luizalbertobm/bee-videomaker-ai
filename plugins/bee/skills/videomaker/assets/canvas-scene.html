@@ -11,12 +11,14 @@
 <script>
 // Constantes lidas por ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/render_canvas.py — manter estes nomes.
 const WIDTH = 1080, HEIGHT = 1920, FPS = 30, DURATION_S = 5;
-// Paleta de exemplo: substituir pelas cores do manual da marca (sources/identidade-visual.md) ou do briefing.
+// Raiz do projeto vista desta cena (videos/<slug>/production/scenes/NN.html): brand/ e library/ ficam lá.
+const ROOT = '../../../../';
+// Paleta de exemplo: substituir pelas cores do manual da marca (brand/brand-guide.md) ou do briefing.
 const PALETTE = { bg: '#101828', fg: '#ffffff', accent: '#ffb703', dark: '#1a1a1a', light: '#f7f7f5' };
-// Fontes da marca em sources/fonts/ (display para títulos, body para corpo/UI). Ajustar nomes e ficheiros.
+// Fontes da marca em brand/fonts/ (display para títulos, body para corpo/UI). Ajustar nomes e ficheiros.
 const FONT = '"BrandDisplay", "DejaVu Sans", Arial, sans-serif';
 const FONT_BODY = '"BrandBody", "DejaVu Sans", Arial, sans-serif';
-const FONT_FACES = [['BrandDisplay', '../sources/fonts/display.ttf', '100 900'], ['BrandBody', '../sources/fonts/body.ttf', '300 800']];
+const FONT_FACES = [['BrandDisplay', ROOT + 'brand/fonts/display.ttf', '100 900'], ['BrandBody', ROOT + 'brand/fonts/body.ttf', '300 800']];
 const loadFonts = () => {
   const st = document.createElement('style');
   st.textContent = FONT_FACES.map(([f, u, w]) => `@font-face{font-family:"${f}";src:url("${u}") format("truetype");font-weight:${w}}`).join('');
@@ -32,8 +34,8 @@ const ctx = canvas.getContext('2d');
 const easeOut = t => 1 - Math.pow(1 - t, 3);
 const clamp01 = t => Math.min(1, Math.max(0, t));
 
-// Imagens fonte (logos) vêm de sources/ — caminho relativo a scenes/
-const ASSETS = { logo: '../sources/logos/logo.svg' };
+// Logos vêm de brand/logos/; material só deste vídeo de '../inputs/' (production/inputs/)
+const ASSETS = { logo: ROOT + 'brand/logos/logo.svg' };
 const img = {};
 const loadAll = () => Promise.all(Object.entries(ASSETS).map(([k, src]) =>
   new Promise((ok, err) => { const i = new Image(); i.onload = () => { img[k] = i; ok(); }; i.onerror = err; i.src = src; })));

@@ -4,8 +4,8 @@ Abre o site no Chrome (Playwright), recusa o aviso de cookies, percorre a págin
 para as animações e grava um PNG alto com a largura que o ecrã do mockup espera.
 
 Uso (a partir da raiz do projeto):
-  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/capture_site.py https://exemplo.com sources/site-desktop.png
-  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/capture_site.py https://exemplo.com sources/site-mobile.png --device mobile
+  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/capture_site.py https://exemplo.com videos/<slug>/production/inputs/site-desktop.png
+  python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/capture_site.py https://exemplo.com videos/<slug>/production/inputs/site-mobile.png --device mobile
   python3 ${CLAUDE_PLUGIN_ROOT}/skills/videomaker/scripts/capture_site.py https://exemplo.com/produtos out.png --hide ".chat-widget,#popup" --max-height 5000
 
 desktop: janela de 1280 px a 1,5x -> imagem com 1920 px de largura (Devices.laptop).

@@ -11,7 +11,7 @@
       "name": "bee",
       "source": "./plugins/bee",
       "description": "Reels e vídeos curtos: Canvas + mockups de dispositivos + ícones Lucide + SFX CC0 + ElevenLabs + ffmpeg + revisor de qualidade",
-      "version": "1.6.0",
+      "version": "2.0.0",
       "category": "productivity"
     }
   ]

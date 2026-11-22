@@ -1,6 +1,6 @@
 // devices.js — mockups de dispositivos em perspetiva (portátil e telemóvel) só com Canvas 2D, com uma página a
 // fazer scroll no ecrã. Sem dependências: incluir nas cenas com <script src="devices.js"></script> (copiado para
-// scenes/ ou referenciado por caminho). Tudo determinístico em função dos argumentos; nada guarda estado entre frames.
+// videos/<slug>/production/scenes/ ou referenciado por caminho). Tudo determinístico em função dos argumentos; nada guarda estado entre frames.
 //
 //   const k = Devices.laptop(ctx, pagina, pose, { scroll, url, theme, glow });
 //   const k = Devices.phone(ctx, pagina, pose, { scroll, theme, glow });
